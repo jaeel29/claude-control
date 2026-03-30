@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   future: { compatibilityVersion: 4 },
   devtools: { enabled: false },
   css: ['~/assets/css/main.css'],
+  modules: ['@nuxt/icon'],
   nitro: {
     experimental: { wasm: false }
   }

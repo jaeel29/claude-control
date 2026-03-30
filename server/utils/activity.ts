@@ -4,18 +4,25 @@ import { join } from 'node:path'
 import { homedir } from 'node:os'
 import { createInterface } from 'node:readline'
 
-export interface ActivityItem {
+export interface ConversationMessage {
   role: 'user' | 'assistant'
   text: string
+  fullText: string
+  timestamp: string
+}
+
+export interface ActivityItem {
+  // The user's question that started this turn
+  text: string
+  fullText: string
   timestamp: string
   project: string
   sessionId: string
-  // Full message for modal
-  fullText: string
-  messageId?: string
+  // Full thread: user message + assistant replies
+  messages: ConversationMessage[]
 }
 
-async function readLastLines(filePath: string, maxLines = 400): Promise<string[]> {
+async function readLastLines(filePath: string, maxLines = 2000): Promise<string[]> {
   const lines: string[] = []
   try {
     const rl = createInterface({ input: createReadStream(filePath), crlfDelay: Infinity })
@@ -60,13 +67,19 @@ export async function getRecentActivity(limit = 50): Promise<ActivityItem[]> {
 
       if (!allFiles.length) continue
 
-      // Sort by modification time desc — most recently active first
       const sorted = await sortedByMtime(projDir, allFiles)
-      // Read the 2 most recently modified session files
-      const recentFiles = sorted.slice(0, 2)
+      const recentFiles = sorted.slice(0, 3)
 
       for (const file of recentFiles) {
         const lines = await readLastLines(join(projDir, file), 400)
+
+        // Parse all messages in this session file, in order
+        const sessionMessages: Array<{
+          role: 'user' | 'assistant'
+          fullText: string
+          timestamp: string
+          sessionId: string
+        }> = []
 
         for (const line of lines) {
           try {
@@ -81,14 +94,11 @@ export async function getRecentActivity(limit = 50): Promise<ActivityItem[]> {
                   ? content.filter((c: any) => c.type === 'text').map((c: any) => c.text).join('\n')
                   : ''
               if (fullText.trim().length > 5) {
-                items.push({
+                sessionMessages.push({
                   role: 'user',
-                  text: fullText.slice(0, 200),
                   fullText,
                   timestamp: entry.timestamp,
-                  project: projectName,
                   sessionId: entry.sessionId ?? '',
-                  messageId: entry.uuid,
                 })
               }
             }
@@ -99,19 +109,46 @@ export async function getRecentActivity(limit = 50): Promise<ActivityItem[]> {
                 ? content.filter((c: any) => c.type === 'text').map((c: any) => c.text).join('\n')
                 : ''
               if (fullText.trim().length > 5) {
-                items.push({
+                sessionMessages.push({
                   role: 'assistant',
-                  text: fullText.slice(0, 200),
                   fullText,
                   timestamp: entry.timestamp,
-                  project: projectName,
                   sessionId: entry.sessionId ?? '',
-                  messageId: entry.uuid,
                 })
               }
             }
           } catch { /* skip malformed lines */ }
         }
+
+        // Group into conversation turns: each turn starts with a user message
+        let currentTurn: ActivityItem | null = null
+
+        for (const msg of sessionMessages) {
+          if (msg.role === 'user') {
+            if (currentTurn) items.push(currentTurn)
+            currentTurn = {
+              text: msg.fullText.slice(0, 200),
+              fullText: msg.fullText,
+              timestamp: msg.timestamp,
+              project: projectName,
+              sessionId: msg.sessionId,
+              messages: [{
+                role: 'user',
+                text: msg.fullText.slice(0, 200),
+                fullText: msg.fullText,
+                timestamp: msg.timestamp,
+              }],
+            }
+          } else if (msg.role === 'assistant' && currentTurn) {
+            currentTurn.messages.push({
+              role: 'assistant',
+              text: msg.fullText.slice(0, 200),
+              fullText: msg.fullText,
+              timestamp: msg.timestamp,
+            })
+          }
+        }
+        if (currentTurn) items.push(currentTurn)
       }
     }
   } catch { /* ignore */ }

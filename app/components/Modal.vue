@@ -60,11 +60,11 @@ onUnmounted(() => {
   </Teleport>
 </template>
 
-<style>
+<style scoped>
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(1, 44, 50, 0.35);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -76,7 +76,8 @@ onUnmounted(() => {
 .modal-content {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
   width: 100%;
   max-width: 620px;
   height: 85vh;
@@ -89,7 +90,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 18px 22px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
@@ -104,19 +105,19 @@ onUnmounted(() => {
 .modal-body {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 22px;
 }
 
 .modal-footer {
-  padding: 14px 20px;
+  padding: 14px 22px;
   border-top: 1px solid var(--border);
   flex-shrink: 0;
 }
 
 .modal-close {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-xs);
   background: transparent;
   border: 1px solid var(--border);
   color: var(--text-secondary);
@@ -127,13 +128,19 @@ onUnmounted(() => {
   justify-content: center;
   transition: background 0.15s, color 0.15s;
 }
-.modal-close:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+.modal-close:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
 
 /* Transitions */
-.modal-fade-enter-active, .modal-fade-leave-active { transition: opacity 0.25s ease; }
-.modal-fade-enter-from, .modal-fade-leave-to { opacity: 0; }
+.modal-fade-enter-active,
+.modal-fade-leave-active { transition: opacity 0.25s ease; }
+.modal-fade-enter-from,
+.modal-fade-leave-to { opacity: 0; }
 
 .modal-slide-enter-active { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease; }
 .modal-slide-leave-active { transition: transform 0.25s cubic-bezier(0.7, 0, 0.84, 0), opacity 0.2s ease; }
-.modal-slide-enter-from, .modal-slide-leave-to { transform: translateY(16px) scale(0.97); opacity: 0; }
+.modal-slide-enter-from,
+.modal-slide-leave-to { transform: translateY(16px) scale(0.97); opacity: 0; }
 </style>
