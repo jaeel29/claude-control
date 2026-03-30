@@ -17,7 +17,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
 	color: 'gray',
-	size: 'sm',
+	size: 'md',
 	dot: false,
 	pulse: false,
 })

@@ -12,7 +12,19 @@ interface ActivityItem {
 	timestamp: string;
 	project: string;
 	sessionId: string;
+	isRunning: boolean;
 	messages: ConversationMessage[];
+}
+
+interface SessionGroup {
+	sessionId: string;
+	project: string;
+	isRunning: boolean;
+	firstPrompt: string;
+	promptCount: number;
+	messageCount: number;
+	lastTimestamp: string;
+	allMessages: ConversationMessage[];
 }
 
 const { data, refresh } = await useFetch<{ items: ActivityItem[] }>('/api/activity');
@@ -22,123 +34,92 @@ onMounted(() => {
 	onUnmounted(() => clearInterval(t));
 });
 
-const selected = ref<ActivityItem | null>(null);
+// Group individual turns into one row per session
+const sessions = computed<SessionGroup[]>(() => {
+	const map = new Map<string, SessionGroup>();
+	for (const item of data.value?.items ?? []) {
+		const key = item.sessionId || item.timestamp; // fallback if no sessionId
+		if (!map.has(key)) {
+			map.set(key, {
+				sessionId: item.sessionId,
+				project: item.project,
+				isRunning: item.isRunning,
+				firstPrompt: item.text,
+				promptCount: 0,
+				messageCount: 0,
+				lastTimestamp: item.timestamp,
+				allMessages: [],
+			});
+		}
+		const g = map.get(key)!;
+		g.isRunning = g.isRunning || item.isRunning;
+		g.promptCount += 1;
+		g.messageCount += item.messages.length;
+		// items are newest-first, so the last one we see is the oldest — keep first timestamp as latest
+		g.allMessages.push(...item.messages);
+	}
+	return [...map.values()];
+});
+
+const selected = ref<SessionGroup | null>(null);
 const showModal = ref(false);
 
-function open(item: ActivityItem) {
-	selected.value = item;
+// Build a synthetic ActivityItem for ConversationModal
+const selectedAsItem = computed(() => {
+	if (!selected.value) return null;
+	return {
+		text: selected.value.firstPrompt,
+		fullText: selected.value.firstPrompt,
+		timestamp: selected.value.lastTimestamp,
+		project: selected.value.project,
+		sessionId: selected.value.sessionId,
+		messages: selected.value.allMessages,
+	};
+});
+
+function open(group: SessionGroup) {
+	selected.value = group;
 	showModal.value = true;
 }
 
-function relativeTime(ts: string) {
-	const diff = Date.now() - new Date(ts).getTime();
-	const m = Math.floor(diff / 60_000);
-	if (m < 1) return 'just now';
-	if (m < 60) return `${m}m ago`;
-	if (m < 1440) return `${Math.floor(m / 60)}h ago`;
-	return `${Math.floor(m / 1440)}d ago`;
-}
-
-function fullDate(ts: string) {
-	return new Date(ts).toLocaleString('en-GB', {
-		day: '2-digit',
-		month: 'short',
-		year: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
-		second: '2-digit',
-	});
-}
-
-function cleanSystemTags(text: string) {
-	return text
-		.replace(
-			/<ide_opened_file>[\s\S]*?opened the file ([^\s<]+)[\s\S]*?<\/ide_opened_file>/g,
-			(_, path) => `@${path.split('/').pop()}`,
-		)
-		.replace(/<[^>]+>[\s\S]*?<\/[^>]+>/g, '')
-		.trim();
-}
-
-function formatText(text: string) {
-	return cleanSystemTags(text)
-		.replace(/```[\s\S]*?```/g, '[code block]')
-		.replace(/`([^`]+)`/g, '$1')
-		.replace(/\*\*(.+?)\*\*/g, '$1')
-		.replace(/#{1,4}\s/g, '')
-		.trim();
-}
-
-function replyCount(item: ActivityItem) {
-	const n = item.messages.filter((m) => m.role === 'assistant').length;
-	return n === 0 ? '' : n === 1 ? '1 reply' : `${n} replies`;
-}
 </script>
 
 <template>
 	<div class="page">
 		<div class="page-header">
-			<h1 class="page-title">Activity</h1>
-			<p class="page-subtitle">Recent conversations across all Claude Code sessions · auto-refreshes every 15s</p>
+			<div>
+				<h1 class="page-title">Activity</h1>
+				<p class="page-subtitle">Recent conversations across all Claude Code sessions · auto-refreshes every 15s</p>
+			</div>
+			<div class="page-header-right">
+				<span class="total-badge">{{ sessions.length }} sessions</span>
+				<UiBadge v-if="sessions.some(s => s.isRunning)" color="green" dot :pulse="true">
+					{{ sessions.filter(s => s.isRunning).length }} running
+				</UiBadge>
+			</div>
 		</div>
 
-		<div v-if="!data?.items.length" class="empty">
+		<div v-if="!sessions.length" class="empty">
 			<Icon name="lucide:activity" size="28" style="opacity: 0.3; display: block; margin: 0 auto 10px" />
 			No activity found
 		</div>
 
 		<div class="activity-list">
-			<div v-for="(item, i) in data?.items" :key="i" class="activity-item activity-clickable" @click="open(item)">
-				<UiBadge color="blue" size="sm">user</UiBadge>
-				<div class="activity-content">
-					<div class="activity-text">{{ formatText(item.text) }}</div>
-					<div v-if="replyCount(item)" class="activity-reply-count">{{ replyCount(item) }}</div>
-				</div>
-				<div class="activity-right">
-					<UiBadge color="gray">{{ item.project }}</UiBadge>
-					<span class="activity-time">{{ relativeTime(item.timestamp) }}</span>
-					<Icon name="lucide:chevron-right" size="14" style="color: var(--text-muted); flex-shrink: 0" />
-				</div>
-			</div>
+			<ActivitySessionRow v-for="group in sessions" :key="group.sessionId" :group="group" @click="open(group)" />
 		</div>
 
-		<!-- Conversation Thread Modal -->
-		<Modal v-model="showModal" title="Conversation">
-			<div v-if="selected">
-				<div class="detail-grid" style="margin-bottom: 16px">
-					<div class="detail-row">
-						<span class="detail-label">Project</span>
-						<code class="detail-code">{{ selected.project }}</code>
-					</div>
-					<div class="detail-row">
-						<span class="detail-label">Time</span>
-						<span class="detail-value">{{ fullDate(selected.timestamp) }}</span>
-					</div>
-					<div class="detail-row">
-						<span class="detail-label">Session</span>
-						<code class="detail-code" style="font-size: 10px">{{ selected.sessionId || '—' }}</code>
-					</div>
-					<div class="detail-row">
-						<span class="detail-label">Messages</span>
-						<span class="detail-value">{{ selected.messages.length }}</span>
-					</div>
-				</div>
-
-				<div class="thread">
-					<div v-for="(msg, mi) in selected.messages" :key="mi" :class="['thread-message', msg.role]">
-						<div class="thread-role">{{ msg.role }}</div>
-						<div class="thread-body">{{ cleanSystemTags(msg.fullText) }}</div>
-					</div>
-				</div>
-			</div>
-		</Modal>
+		<ConversationModal v-model="showModal" :item="selectedAsItem" />
 	</div>
 </template>
 
 <style scoped>
 /* ── Page header ── */
 .page-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
 	margin-bottom: 28px;
+	gap: 16px;
 }
 .page-title {
 	font-size: 22px;
@@ -150,6 +131,22 @@ function replyCount(item: ActivityItem) {
 	font-size: 13px;
 	color: var(--text-secondary);
 	margin-top: 3px;
+}
+.page-header-right {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
+	padding-top: 4px;
+}
+.total-badge {
+	font-size: 11px;
+	font-weight: 500;
+	color: var(--text-muted);
+	background: var(--bg-card);
+	border: 1px solid var(--border);
+	border-radius: 20px;
+	padding: 3px 10px;
 }
 
 /* ── Empty ── */
@@ -164,55 +161,54 @@ function replyCount(item: ActivityItem) {
 .activity-list {
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
+	gap: 6px;
 }
 .activity-item {
 	background: var(--bg-card);
 	border: 1px solid transparent;
 	border-radius: var(--radius);
-	padding: 16px 20px;
+	padding: 14px 18px;
 	display: flex;
-	align-items: flex-start;
-	gap: 16px;
+	align-items: center;
+	gap: 14px;
 	box-shadow: var(--shadow-sm);
 }
 .activity-clickable {
 	cursor: pointer;
-	transition:
-		box-shadow 0.15s,
-		border-color 0.15s;
+	transition: border-color 0.15s;
 }
 .activity-clickable:hover {
-	/* box-shadow: var(--shadow); */
 	border-color: #dadada;
 }
-.activity-role {
-	font-size: 10px;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.07em;
+.activity-badge-col {
 	flex-shrink: 0;
-	padding-top: 2px;
-	width: 52px;
-}
-.activity-role.user {
-	color: var(--accent);
 }
 .activity-content {
 	flex: 1;
 	min-width: 0;
+}
+.activity-project {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 3px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .activity-text {
 	font-size: 12px;
 	color: var(--text-secondary);
 	line-height: 1.5;
 	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	line-clamp: 2;
+	-webkit-line-clamp: 1;
+	line-clamp: 1;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
 }
-.activity-reply-count {
+.activity-meta {
+	display: flex;
+	gap: 5px;
 	font-size: 11px;
 	color: var(--text-muted);
 	margin-top: 4px;
@@ -221,104 +217,11 @@ function replyCount(item: ActivityItem) {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-end;
-	gap: 4px;
+	gap: 6px;
 	flex-shrink: 0;
-	padding-left: 12px;
 }
 .activity-time {
 	font-size: 10px;
 	color: var(--text-muted);
-}
-
-/* ── Thread ── */
-.thread {
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
-}
-.thread-message {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	max-width: 88%;
-}
-.thread-message.user {
-	align-self: flex-end;
-	align-items: flex-end;
-}
-.thread-message.assistant {
-	align-self: flex-start;
-	align-items: flex-start;
-}
-.thread-role {
-	font-size: 10px;
-	font-weight: 700;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
-	color: var(--text-muted);
-	padding: 0 4px;
-}
-.thread-body {
-	font-size: 13px;
-	line-height: 1.75;
-	white-space: pre-wrap;
-	word-break: break-word;
-	padding: 10px 14px;
-	border-radius: 14px;
-}
-.thread-message.user .thread-body {
-	background: var(--accent-dim);
-	border: 1px solid var(--accent-border);
-	color: var(--text-primary);
-	border-bottom-right-radius: 4px;
-}
-.thread-message.assistant .thread-body {
-	background: var(--bg-surface);
-	border: 1px solid var(--border);
-	color: var(--text-secondary);
-	border-bottom-left-radius: 4px;
-}
-
-/* ── Detail modal ── */
-.detail-grid {
-	display: flex;
-	flex-direction: column;
-	gap: 1px;
-	background: var(--border);
-	border-radius: var(--radius-sm);
-	overflow: hidden;
-	margin-bottom: 16px;
-}
-.detail-row {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	padding: 10px 0;
-	background: var(--bg-card);
-}
-.detail-label {
-	font-size: 12px;
-	color: var(--text-secondary);
-	flex-shrink: 0;
-}
-.detail-value {
-	font-size: 12px;
-	color: var(--text-primary);
-}
-.detail-code {
-	font-family: 'SF Mono', 'Fira Code', monospace;
-	font-size: 11px;
-	color: var(--accent);
-	background: var(--accent-dim);
-	border: 1px solid var(--accent-border);
-	border-radius: 4px;
-	padding: 2px 7px;
-	max-width: 280px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	display: block;
-	text-align: right;
 }
 </style>

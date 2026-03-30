@@ -137,9 +137,9 @@ onUnmounted(() => {
 .modal-close {
 	width: 30px;
 	height: 30px;
-	border-radius: var(--radius-xs);
 	background: transparent;
 	border: 1px solid var(--border);
+	border-radius: 999px;
 	color: var(--text-secondary);
 	cursor: pointer;
 	font-size: 12px;

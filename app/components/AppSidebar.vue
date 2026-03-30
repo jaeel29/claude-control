@@ -13,7 +13,7 @@ const nav = [
   { label: 'Overview',  href: '/',         icon: 'lucide:layout-dashboard' },
   { label: 'Activity',  href: '/activity',  icon: 'lucide:activity' },
   { label: 'Agents',    href: '/agents',    icon: 'lucide:bot' },
-  // { label: 'Tasks',     href: '/tasks',     icon: 'lucide:check-square' },
+  { label: 'Tasks',     href: '/tasks',     icon: 'lucide:check-square' },
   { label: 'Logs',      href: '/logs',      icon: 'lucide:scroll-text' },
   { label: 'Run',       href: '/run',       icon: 'lucide:send' },
 ]
@@ -38,7 +38,7 @@ function projectInitial(name: string) {
     <!-- ── Workspace ── -->
     <div class="workspace">
       <div class="workspace-avatar">
-        <Icon name="lucide:terminal" size="13" color="#fff" />
+        <Icon name="icons:logo" :size="24" mode="svg" />
       </div>
       <div class="workspace-info">
         <div class="workspace-name">Claude Control</div>
@@ -123,16 +123,16 @@ function projectInitial(name: string) {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 4px 8px 14px;
-  margin-bottom: 4px;
+  /* padding: 4px 8px; */
+  margin-bottom: 24px;
   /* border-bottom: 1px solid var(--sidebar-divider); */
 }
 
 .workspace-avatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
-  background: #111827;
+  border: 1px solid #eaeaea;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -148,7 +148,7 @@ function projectInitial(name: string) {
 
 .workspace-sub {
   font-size: 11px;
-  color: var(--text-muted);
+  color: #999;
 }
 
 /* ── Search ── */
@@ -235,8 +235,8 @@ function projectInitial(name: string) {
   user-select: none;
 }
 .nav-item:hover {
-  background: var(--sidebar-hover);
-  color: var(--sidebar-text-active);
+  background: #f5f5f5;
+  color: #111827;
 }
 .nav-item.active {
   background: #111827;

@@ -6,5 +6,12 @@ export default defineNuxtConfig({
   modules: ['@nuxt/icon'],
   nitro: {
     experimental: { wasm: false }
-  }
-})
+  },
+
+  icon: {
+    customCollections: [{
+      prefix: 'icons',
+      dir: './app/assets/icons'
+    }],
+  },
+});

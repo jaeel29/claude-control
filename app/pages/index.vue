@@ -12,6 +12,7 @@ interface ActivityItem {
 	timestamp: string;
 	project: string;
 	sessionId: string;
+	isRunning: boolean;
 	messages: ConversationMessage[];
 }
 
@@ -42,36 +43,51 @@ function openSession(s: Session) {
 	showModal.value = true;
 }
 
-function relativeTime(ts: string) {
-	const diff = Date.now() - new Date(ts).getTime();
-	const m = Math.floor(diff / 60_000);
-	if (m < 1) return 'just now';
-	if (m < 60) return `${m}m ago`;
-	return `${Math.floor(m / 60)}h ago`;
-}
+import type { SessionGroup } from '~/components/ActivitySessionRow.vue';
 
-const selectedActivity = ref<ActivityItem | null>(null);
+const activitySessions = computed<SessionGroup[]>(() => {
+	const map = new Map<string, SessionGroup>();
+	for (const item of data.value?.activity ?? []) {
+		const key = item.sessionId || item.timestamp;
+		if (!map.has(key)) {
+			map.set(key, {
+				sessionId: item.sessionId,
+				project: item.project,
+				isRunning: item.isRunning,
+				firstPrompt: item.text,
+				promptCount: 0,
+				messageCount: 0,
+				lastTimestamp: item.timestamp,
+				allMessages: [],
+			});
+		}
+		const g = map.get(key)!;
+		g.isRunning = g.isRunning || item.isRunning;
+		g.promptCount += 1;
+		g.messageCount += item.messages.length;
+		g.allMessages.push(...item.messages);
+	}
+	return [...map.values()].slice(0, 5);
+});
+
+const selectedActivity = ref<SessionGroup | null>(null);
 const showActivityModal = ref(false);
 
-function openActivity(item: ActivityItem) {
-	selectedActivity.value = item;
+const selectedActivityAsItem = computed(() => {
+	if (!selectedActivity.value) return null;
+	return {
+		text: selectedActivity.value.firstPrompt,
+		fullText: selectedActivity.value.firstPrompt,
+		timestamp: selectedActivity.value.lastTimestamp,
+		project: selectedActivity.value.project,
+		sessionId: selectedActivity.value.sessionId,
+		messages: selectedActivity.value.allMessages,
+	};
+});
+
+function openActivity(group: SessionGroup) {
+	selectedActivity.value = group;
 	showActivityModal.value = true;
-}
-
-function replyCount(item: ActivityItem) {
-	const n = item.messages.filter((m) => m.role === 'assistant').length;
-	return n === 0 ? '' : n === 1 ? '1 reply' : `${n} replies`;
-}
-
-function fullDate(ts: string) {
-	return new Date(ts).toLocaleString('en-GB', {
-		day: '2-digit',
-		month: 'short',
-		year: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
-		second: '2-digit',
-	});
 }
 
 function modeColor(mode: string) {
@@ -80,15 +96,6 @@ function modeColor(mode: string) {
 	return 'var(--text-secondary)';
 }
 
-function cleanSystemTags(text: string) {
-	return text
-		.replace(
-			/<ide_opened_file>[\s\S]*?opened the file ([^\s<]+)[\s\S]*?<\/ide_opened_file>/g,
-			(_, path) => `@${path.split('/').pop()}`,
-		)
-		.replace(/<[^>]+>[\s\S]*?<\/[^>]+>/g, '')
-		.trim();
-}
 </script>
 
 <template>
@@ -126,10 +133,24 @@ function cleanSystemTags(text: string) {
 				</div>
 			</div>
 			<div class="stat-card">
-				<div class="stat-value">{{ data?.stats.promptsToday ?? 0 }}</div>
+				<div class="stat-value">{{ data?.stats.filesModifiedToday ?? 0 }}</div>
 				<div class="stat-label">
 					<span class="stat-dot" style="background: var(--blue)"></span>
-					Prompts Today
+					Files Modified Today
+				</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-value">{{ data?.stats.toolCallsToday ?? 0 }}</div>
+				<div class="stat-label">
+					<span class="stat-dot" style="background: var(--yellow)"></span>
+					Tool Calls Today
+				</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-value">{{ data?.stats.commandsRunToday ?? 0 }}</div>
+				<div class="stat-label">
+					<span class="stat-dot" style="background: var(--text-muted)"></span>
+					Commands Run Today
 				</div>
 			</div>
 		</div>
@@ -140,7 +161,7 @@ function cleanSystemTags(text: string) {
 				<div class="section-title">Recent Activity</div>
 			</div>
 
-			<div v-if="!data?.activity.length" class="card">
+			<div v-if="!activitySessions.length" class="card">
 				<div class="empty">
 					<Icon name="lucide:message-square" size="28" style="opacity: 0.3; display: block; margin: 0 auto 10px" />
 					No recent activity found
@@ -148,24 +169,12 @@ function cleanSystemTags(text: string) {
 			</div>
 
 			<div class="activity-list">
-				<div
-					v-for="(item, i) in data?.activity.slice(0, 5)"
-					:key="i"
-					class="activity-item activity-clickable"
-					@click="openActivity(item)"
-				>
-          <UiBadge color="blue" size="sm">user</UiBadge>
-
-					<div class="activity-content">
-						<div class="activity-text">{{ cleanSystemTags(item.text) }}</div>
-						<div v-if="replyCount(item)" class="activity-reply-count">{{ replyCount(item) }}</div>
-					</div>
-					<div class="activity-right">
-						<!-- <span class="activity-project-badge">{{ item.project }}</span> -->
-						<span class="activity-time">{{ relativeTime(item.timestamp) }}</span>
-						<Icon name="lucide:chevron-right" size="14" style="color: var(--text-muted); flex-shrink: 0" />
-					</div>
-				</div>
+				<ActivitySessionRow
+					v-for="group in activitySessions"
+					:key="group.sessionId"
+					:group="group"
+					@click="openActivity(group)"
+				/>
 			</div>
 		</div>
 
@@ -188,10 +197,8 @@ function cleanSystemTags(text: string) {
 
 			<div v-else class="card">
 				<div v-for="s in data?.sessions.slice(0, 5)" :key="s.pid" class="card-row session-row" @click="openSession(s)">
-					<span class="status online">
-						<span class="status-dot"></span>
-						Active
-					</span>
+          <UiBadge color="green" dot :pulse="true">Active</UiBadge>
+
 					<div class="session-info">
 						<div class="session-project">{{ s.project || `PID ${s.pid}` }}</div>
 						<div class="session-mode" :style="{ color: modeColor(s.mode) }">{{ s.mode }}</div>
@@ -204,35 +211,7 @@ function cleanSystemTags(text: string) {
 			</div>
 		</div>
 
-		<!-- Activity Detail Modal -->
-		<Modal v-model="showActivityModal" title="Conversation">
-			<div v-if="selectedActivity">
-				<div class="detail-grid" style="margin-bottom: 16px">
-					<div class="detail-row">
-						<span class="detail-label">Project</span>
-						<code class="detail-code">{{ selectedActivity.project }}</code>
-					</div>
-					<div class="detail-row">
-						<span class="detail-label">Time</span>
-						<span class="detail-value">{{ fullDate(selectedActivity.timestamp) }}</span>
-					</div>
-					<div class="detail-row">
-						<span class="detail-label">Session</span>
-						<code class="detail-code" style="font-size: 10px">{{ selectedActivity.sessionId || '—' }}</code>
-					</div>
-					<div class="detail-row">
-						<span class="detail-label">Messages</span>
-						<span class="detail-value">{{ selectedActivity.messages.length }}</span>
-					</div>
-				</div>
-				<div class="thread">
-					<div v-for="(msg, mi) in selectedActivity.messages" :key="mi" :class="['thread-message', msg.role]">
-						<div class="thread-role">{{ msg.role }}</div>
-						<div class="thread-body">{{ cleanSystemTags(msg.fullText) }}</div>
-					</div>
-				</div>
-			</div>
-		</Modal>
+		<ConversationModal v-model="showActivityModal" :item="selectedActivityAsItem" />
 
 		<!-- Session Detail Modal -->
 		<Modal v-model="showModal" :title="`Session · ${selectedSession?.project || 'Unknown'}`">
@@ -316,8 +295,8 @@ function cleanSystemTags(text: string) {
 /* ── Stat cards ── */
 .stats-grid {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 12px;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px;
 	margin-bottom: 28px;
 }
 .stat-card {
@@ -325,8 +304,6 @@ function cleanSystemTags(text: string) {
 	border: 1px solid var(--border);
 	border-radius: 16px;
 	padding: 24px;
-  /* height: 140px; */
-	/* box-shadow: var(--shadow-sm); */
 }
 .stat-value {
 	font-size: 24px;
@@ -335,7 +312,12 @@ function cleanSystemTags(text: string) {
 	letter-spacing: -0.03em;
 	line-height: 1;
 }
-
+.stat-unit {
+	font-size: 0.55em;
+	font-weight: 400;
+	color: var(--text-muted);
+	margin-left: 2px;
+}
 .text-muted {
 	color: var(--text-muted);
 }
@@ -480,137 +462,15 @@ function cleanSystemTags(text: string) {
 	flex-direction: column;
 	gap: 6px;
 }
-.activity-item {
-	background: var(--bg-card);
-	border: 1px solid var(--border);
-	border-radius: var(--radius);
-	padding: 14px 18px;
-	display: flex;
-	gap: 12px;
-	align-items: flex-start;
-	/* box-shadow: var(--shadow-sm); */
-}
-.activity-clickable {
-	cursor: pointer;
-	transition:
-		border-color 0.15s,
-		/* box-shadow 0.15s; */
-}
-.activity-clickable:hover {
-	border-color: #dadada;
-	/* box-shadow: var(--shadow); */
-}
-.activity-role {
-	font-size: 10px;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	flex-shrink: 0;
-	padding-top: 1px;
-	width: 60px;
-}
-.activity-role.user {
-	color: var(--blue);
-}
-.activity-content {
-	flex: 1;
-	min-width: 0;
-}
-.activity-text {
-	font-size: 12px;
-	color: var(--text-secondary);
-	line-height: 1.5;
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	line-clamp: 2;
-	-webkit-box-orient: vertical;
-	overflow: hidden;
-}
-.activity-reply-count {
-	font-size: 11px;
-	color: var(--text-muted);
-	margin-top: 4px;
-}
-.activity-right {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	gap: 4px;
-	flex-shrink: 0;
-	padding-left: 12px;
-}
-.activity-project-badge {
-	font-size: 10px;
-	font-weight: 600;
-	/* color: var(--text-secondary); */
-	/* background: var(--accent-dim); */
-	/* border: 1px solid var(--accent-border); */
-	/* padding: 2px 7px; */
-	border-radius: 4px;
-	white-space: nowrap;
-}
-.activity-time {
-	font-size: 10px;
-	color: var(--text-muted);
-}
-
-/* ── Thread ── */
-.thread {
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
-}
-.thread-message {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	max-width: 88%;
-}
-.thread-message.user {
-	align-self: flex-end;
-	align-items: flex-end;
-}
-.thread-message.assistant {
-	align-self: flex-start;
-	align-items: flex-start;
-}
-.thread-role {
-	font-size: 10px;
-	font-weight: 700;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
-	color: var(--text-muted);
-	padding: 0 4px;
-}
-.thread-body {
-	font-size: 13px;
-	line-height: 1.75;
-	white-space: pre-wrap;
-	word-break: break-word;
-	padding: 10px 14px;
-	border-radius: 14px;
-}
-.thread-message.user .thread-body {
-	background: var(--accent-dim);
-	border: 1px solid var(--accent-border);
-	color: var(--text-primary);
-	border-bottom-right-radius: 4px;
-}
-.thread-message.assistant .thread-body {
-	background: var(--bg-surface);
-	border: 1px solid var(--border);
-	color: var(--text-secondary);
-	border-bottom-left-radius: 4px;
-}
 
 /* ── Detail modal ── */
 .detail-grid {
 	display: flex;
 	flex-direction: column;
-	gap: 1px;
-	background: var(--border);
+	gap: 4px;
+	/* background: var(--border); */  
 	border-radius: var(--radius-sm);
-	overflow: hidden;
+	/* overflow: hidden; */
 	margin-bottom: 16px;
 }
 .detail-row {
@@ -620,6 +480,9 @@ function cleanSystemTags(text: string) {
 	gap: 12px;
 	padding: 10px 0;
 	background: var(--bg-card);
+  border: 1px solid #ededed;
+  border-radius: 10px;
+  padding: 10px;
 }
 .detail-label {
 	font-size: 12px;
@@ -631,19 +494,24 @@ function cleanSystemTags(text: string) {
 	color: var(--text-primary);
 }
 .detail-code {
-	font-family: 'SF Mono', 'Fira Code', monospace;
-	font-size: 11px;
-	color: var(--accent);
-	background: var(--accent-dim);
-	border: 1px solid var(--accent-border);
-	border-radius: 4px;
-	padding: 2px 7px;
-	max-width: 280px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	display: block;
-	text-align: right;
+	/* font-family: 'SF Mono', 'Fira Code', monospace; */
+	font-size: 12px;
+	/* color: var(--accent); */
+	/* background: var(--accent-dim); */
+	/* border: 1px solid var(--accent-border); */
+	/* border-radius: 4px; */
+	/* padding: 2px 7px; */
+	/* max-width: 280px; */
+	/* overflow: hidden; */
+	/* text-overflow: ellipsis; */
+	/* white-space: nowrap; */
+	/* display: block; */
+	/* text-align: right; */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  text-align: right;
 }
 .detail-section {
 	margin-bottom: 16px;
@@ -657,7 +525,7 @@ function cleanSystemTags(text: string) {
 	margin-bottom: 8px;
 }
 .detail-path {
-	font-family: 'SF Mono', 'Fira Code', monospace;
+	/* font-family: 'SF Mono', 'Fira Code', monospace; */
 	font-size: 11px;
 	color: var(--text-secondary);
 	background: var(--bg-surface);
@@ -674,7 +542,7 @@ function cleanSystemTags(text: string) {
 	gap: 5px;
 }
 .detail-arg {
-	font-family: 'SF Mono', 'Fira Code', monospace;
+	/* font-family: 'SF Mono', 'Fira Code', monospace; */
 	font-size: 10px;
 	padding: 3px 8px;
 	border-radius: 4px;
