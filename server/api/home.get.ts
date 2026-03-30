@@ -27,12 +27,17 @@ export default defineEventHandler(async () => {
   const projectAgentCount = projectAgents.reduce((sum, p) => sum + p.agents.length, 0)
   const activeProjects = new Set(sessions.map(s => s.cwd).filter(Boolean)).size
 
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  const promptsToday = activity.filter(a => new Date(a.timestamp) >= todayStart).length
+
   return {
     stats: {
       running: sessions.length,
       activeProjects,
       totalAgents: globalAgents.length + projectAgentCount,
       projects: totalProjects,
+      promptsToday,
     },
     sessions,
     activity,

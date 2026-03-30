@@ -40,28 +40,30 @@ body {
 /* ── Design Tokens ─────────────────────────────────────── */
 :root {
   /* Backgrounds */
-  --bg-global:       #f3f7f6;
+  --bg-global:       #f4f4f4;
   --bg:              #ffffff;
-  --bg-surface:      #f3f7f6;
+  --bg-surface:      #f4f5f7;
   --bg-card:         #ffffff;
-  --bg-card-hover:   #f7faf9;
+  --bg-card-hover:   #f9fafb;
 
-  /* Sidebar (dark teal) */
-  --bg-sidebar:      #012c32;
-  --sidebar-text:    #b9c9c6;
-  --sidebar-text-active: #00b695;
-  --sidebar-hover:   rgba(0, 182, 149, 0.1);
-  --sidebar-active:  rgba(0, 182, 149, 0.12);
-  --sidebar-divider: rgba(182, 199, 196, 0.2);
+  /* Sidebar (light) */
+  --bg-sidebar:      #ffffff;
+  --sidebar-border:  #e8eaed;
+  --sidebar-text:    #5f6368;
+  --sidebar-text-active: #111827;
+  --sidebar-hover:   #f1f3f4;
+  --sidebar-active:  #e8f0fe;
+  --sidebar-active-text: #1a73e8;
+  --sidebar-divider: #e8eaed;
 
   /* Borders */
-  --border:          #e0e8e6;
-  --border-light:    #ecf1f0;
+  --border:          #e5e7eb;
+  --border-light:    #f3f4f6;
 
   /* Text */
-  --text-primary:    #012c32;
-  --text-secondary:  #4d6b67;
-  --text-muted:      #8fa8a4;
+  --text-primary:    #111827;
+  --text-secondary:  #374151;
+  --text-muted:      #9ca3af;
 
   /* Accent — teal */
   --accent:          #00b695;
@@ -81,20 +83,79 @@ body {
 
   /* Shadows */
   --shadow-sm:
-    0px 2px 6px 0px rgba(0, 0, 0, 0.04),
-    0px 0.5px 1.5px 0px rgba(0, 0, 0, 0.05);
+    0px 1px 3px 0px rgba(0, 0, 0, 0.06),
+    0px 1px 2px 0px rgba(0, 0, 0, 0.04);
   --shadow:
-    0px 9px 26px 0px rgba(0, 0, 0, 0.04),
-    0px 2.7px 7.8px 0px rgba(0, 0, 0, 0.05),
-    0px 1.1px 3.3px 0px rgba(0, 0, 0, 0.05);
+    0px 4px 12px 0px rgba(0, 0, 0, 0.06),
+    0px 1px 4px 0px rgba(0, 0, 0, 0.04);
   --shadow-lg:
-    0px 20px 60px rgba(0, 0, 0, 0.08),
-    0px 4px 16px rgba(0, 0, 0, 0.05);
+    0px 20px 60px rgba(0, 0, 0, 0.10),
+    0px 4px 16px rgba(0, 0, 0, 0.06);
 
-  --sidebar-w:       224px;
+  --sidebar-w:       240px;
   --radius:          12px;
   --radius-sm:       8px;
   --radius-xs:       6px;
+
+  /* ── Button tokens ── */
+  /* primary = black */
+  --button-primary-bg:              #111827;
+  --button-primary-text:            #ffffff;
+  --button-primary-hover:           #1f2937;
+  --button-primary-active:          #0a0f1a;
+  --button-primary-disabled-bg:     #9ca3af;
+  --button-primary-disabled-text:   #ffffff;
+
+  /* secondary = light gray */
+  --button-secondary-bg:            #f3f4f6;
+  --button-secondary-text:          #111827;
+  --button-secondary-hover:         #e5e7eb;
+  --button-secondary-active:        #d1d5db;
+  --button-secondary-disabled-bg:   #f9fafb;
+  --button-secondary-disabled-text: #9ca3af;
+
+  /* neutral = black (same as primary here) */
+  --button-neutral-bg:              #111827;
+  --button-neutral-text:            #ffffff;
+  --button-neutral-hover:           #1f2937;
+  --button-neutral-active:          #0a0f1a;
+  --button-neutral-disabled-bg:     #9ca3af;
+  --button-neutral-disabled-text:   #ffffff;
+
+  /* neutral-static */
+  --button-neutral-static-bg:              #111827;
+  --button-neutral-static-text:            #ffffff;
+  --button-neutral-static-hover:           #1f2937;
+  --button-neutral-static-active:          #0a0f1a;
+  --button-neutral-static-disabled-bg:     #6b7280;
+  --button-neutral-static-disabled-text:   #ffffff;
+
+  /* outline */
+  --button-outline-bg:              transparent;
+  --button-outline-text:            #111827;
+  --button-outline-border:          #e5e7eb;
+  --button-outline-hover:           #f9fafb;
+  --button-outline-active:          #f3f4f6;
+  --button-outline-border-hover:    #d1d5db;
+  --button-outline-disabled-bg:     transparent;
+  --button-outline-disabled-text:   #9ca3af;
+  --button-outline-disabled-border: #e5e7eb;
+
+  /* ghost */
+  --button-ghost-bg:              transparent;
+  --button-ghost-text:            #374151;
+  --button-ghost-hover:           #f3f4f6;
+  --button-ghost-active:          #e5e7eb;
+  --button-ghost-disabled-bg:     transparent;
+  --button-ghost-disabled-text:   #9ca3af;
+
+  /* blury */
+  --button-blury-bg:              rgba(255,255,255,0.2);
+  --button-blury-text:            #ffffff;
+  --button-blury-border:          rgba(255,255,255,0.2);
+  --button-blury-disabled-bg:     rgba(255,255,255,0.08);
+  --button-blury-disabled-text:   rgba(255,255,255,0.4);
+  --button-blury-disabled-border: rgba(255,255,255,0.08);
 }
 
 /* ── App Shell ─────────────────────────────────────────── */
@@ -110,6 +171,7 @@ body {
   flex: 1;
   overflow-y: auto;
   background: var(--bg-global);
+  border-left: 1px solid var(--sidebar-border);
 }
 
 .page {

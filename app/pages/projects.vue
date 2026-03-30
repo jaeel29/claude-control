@@ -71,10 +71,9 @@ function relativeTime(ts: string | null) {
           <div class="project-icon">◈</div>
           <div class="project-title-group">
             <div class="project-name">{{ proj.name }}</div>
-            <div v-if="proj.sessionCount > 0" class="project-running-badge">
-              <span class="pulse-dot"></span>
+            <UiBadge v-if="proj.sessionCount > 0" color="green" dot :pulse="true">
               {{ proj.sessionCount }} running
-            </div>
+            </UiBadge>
           </div>
           <div class="project-last-active">{{ relativeTime(proj.lastActive) }}</div>
         </div>
@@ -83,8 +82,8 @@ function relativeTime(ts: string | null) {
         <div v-else class="project-path project-path-missing">path not found on disk</div>
 
         <div class="project-footer">
-          <span v-if="proj.hasLocalAgents" class="tag">local agents</span>
-          <span v-if="!proj.path" class="tag muted">archived</span>
+          <UiBadge v-if="proj.hasLocalAgents" color="outline">local agents</UiBadge>
+          <UiBadge v-if="!proj.path" color="gray">archived</UiBadge>
         </div>
       </div>
     </div>
@@ -235,13 +234,6 @@ function relativeTime(ts: string | null) {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.project-running-badge {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  color: var(--green);
-}
 .project-last-active {
   font-size: 11px;
   color: var(--text-muted);
@@ -273,17 +265,5 @@ function relativeTime(ts: string | null) {
   gap: 6px;
   flex-wrap: wrap;
   min-height: 20px;
-}
-.tag {
-  font-size: 10px;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  background: var(--bg-surface);
-}
-.tag.muted {
-  color: var(--text-muted);
 }
 </style>

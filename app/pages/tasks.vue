@@ -134,9 +134,7 @@ function statusIcon(status: string) {
         <div v-for="session in todosData.sessions" :key="session.sessionId" class="todo-card">
           <div class="todo-card-header">
             <div class="todo-project">{{ session.project }}</div>
-            <span v-if="session.isRunning" class="running-badge">
-              <span class="running-dot"></span>running
-            </span>
+            <UiBadge v-if="session.isRunning" color="green" dot :pulse="true">running</UiBadge>
             <span class="todo-time">{{ relativeTime(session.lastModified) }}</span>
           </div>
           <div class="todo-list">
@@ -169,10 +167,10 @@ function statusIcon(status: string) {
           Task Board
           <span class="section-count">{{ tasksData?.tasks.length ?? 0 }}</span>
         </div>
-        <button class="new-task-btn" @click="openAddModal">
-          <Icon name="lucide:plus" size="13" />
+        <UiButton variant="outline" size="small" @click="openAddModal">
+          <template #icon-left><Icon name="lucide:plus" size="13" /></template>
           New Task
-        </button>
+        </UiButton>
       </div>
 
       <!-- Kanban columns -->
@@ -329,15 +327,16 @@ function statusIcon(status: string) {
           </div>
 
           <div class="modal-footer">
-            <button class="btn-cancel" @click="showAddModal = false">Cancel</button>
-            <button
-              class="btn-create"
+            <UiButton variant="outline" size="medium" @click="showAddModal = false">Cancel</UiButton>
+            <UiButton
+              variant="neutral"
+              size="medium"
               :disabled="addingTask || !modalTitle.trim()"
               @click="submitAddTask"
             >
-              <Icon name="lucide:plus" size="14" />
+              <template #icon-left><Icon name="lucide:plus" size="14" /></template>
               {{ addingTask ? 'Creating…' : 'Create Task' }}
-            </button>
+            </UiButton>
           </div>
         </div>
       </div>
@@ -402,27 +401,6 @@ function statusIcon(status: string) {
   animation: pulse 2s infinite;
   display: inline-block;
 }
-.running-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--green);
-  background: var(--green-dim);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: 20px;
-  padding: 2px 7px;
-}
-.running-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--green);
-  animation: pulse 2s infinite;
-  flex-shrink: 0;
-}
-
 /* ── Todo sessions ── */
 .todo-sessions { display: flex; flex-direction: column; gap: 10px; }
 .todo-card {

@@ -43,8 +43,8 @@ function toolList(tools: string) {
           </div>
           <div class="agent-desc">{{ agent.description }}</div>
           <div class="agent-meta">
-            <span class="tag model">{{ agent.model || 'default' }}</span>
-            <span v-for="tool in toolList(agent.tools)" :key="tool" class="tag tool">{{ tool }}</span>
+            <UiBadge color="teal">{{ agent.model || 'default' }}</UiBadge>
+            <UiBadge v-for="tool in toolList(agent.tools)" :key="tool" color="gray">{{ tool }}</UiBadge>
           </div>
         </div>
       </div>
@@ -73,8 +73,8 @@ function toolList(tools: string) {
           </div>
           <div class="agent-desc">{{ agent.description }}</div>
           <div class="agent-meta">
-            <span class="tag model">{{ agent.model || 'default' }}</span>
-            <span v-for="tool in toolList(agent.tools)" :key="tool" class="tag tool">{{ tool }}</span>
+            <UiBadge color="teal">{{ agent.model || 'default' }}</UiBadge>
+            <UiBadge v-for="tool in toolList(agent.tools)" :key="tool" color="gray">{{ tool }}</UiBadge>
           </div>
         </div>
       </div>
@@ -160,12 +160,12 @@ function toolList(tools: string) {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 18px 20px;
-  box-shadow: var(--shadow-sm);
+  /* box-shadow: var(--shadow-sm); */
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .agent-card:hover {
   border-color: var(--accent-border);
-  box-shadow: var(--shadow);
+  /* box-shadow: var(--shadow); */
 }
 .agent-card-header {
   display: flex;
@@ -215,15 +215,4 @@ function toolList(tools: string) {
   gap: 5px;
 }
 
-/* ── Tags ── */
-.tag {
-  font-size: 10px;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  background: var(--bg-surface);
-}
-.tag.model { color: var(--accent); border-color: var(--accent-border); background: var(--accent-dim); }
 </style>

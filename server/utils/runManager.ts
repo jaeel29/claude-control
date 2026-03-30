@@ -1,6 +1,7 @@
 import { spawn as nodeSpawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
+import { saveRunHistory } from './runHistory'
 
 export interface RunJob {
   prompt: string
@@ -10,6 +11,7 @@ export interface RunJob {
   done: boolean
   exitCode: number | null
   startedAt: string
+  sessionId?: string
   listeners: Set<(chunk: string) => void>
   kill: () => void
 }
@@ -30,7 +32,7 @@ function findCli(): string {
   return candidates.find(p => existsSync(p)) ?? (candidates[0] as string)
 }
 
-export function createRun(prompt: string, cwd: string, project: string): string {
+export function createRun(prompt: string, cwd: string, project: string, resumeSessionId?: string): string {
   const runId = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
   const CLI = findCli()
 
@@ -40,7 +42,10 @@ export function createRun(prompt: string, cwd: string, project: string): string 
     PATH: `${HOME}/.bun/bin:${HOME}/.nvm/versions/node/v20.19.5/bin:/usr/local/bin:/usr/bin:/bin:${process.env.PATH ?? ''}`,
   }
 
-  const proc = nodeSpawn(BUN, [CLI, '-p', prompt, '--output-format', 'stream-json', '--verbose'], {
+  const baseArgs = [CLI, '-p', prompt, '--output-format', 'stream-json', '--verbose', '--dangerously-skip-permissions']
+  const args = resumeSessionId ? [...baseArgs, '--resume', resumeSessionId] : baseArgs
+
+  const proc = nodeSpawn(BUN, args, {
     cwd,
     shell: false,
     env,
@@ -64,7 +69,16 @@ export function createRun(prompt: string, cwd: string, project: string): string 
   }
 
   proc.stdout.on('data', (data: Buffer) => {
-    for (const line of data.toString().split('\n').filter(l => l.trim())) push(line)
+    for (const line of data.toString().split('\n').filter(l => l.trim())) {
+      // Capture session_id from init event
+      try {
+        const e = JSON.parse(line)
+        if (e.type === 'system' && e.subtype === 'init' && e.session_id) {
+          job.sessionId = e.session_id
+        }
+      } catch { /* not json */ }
+      push(line)
+    }
   })
 
   proc.stderr.on('data', (data: Buffer) => {
@@ -75,6 +89,7 @@ export function createRun(prompt: string, cwd: string, project: string): string 
     job.done = true
     job.exitCode = code
     push(JSON.stringify({ type: 'done', code }))
+    saveRunHistory(runId, job)
   })
 
   proc.on('error', (err: Error) => {
