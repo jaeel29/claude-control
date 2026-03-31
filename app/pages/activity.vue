@@ -36,7 +36,7 @@ interface SessionGroup {
 const { data, refresh } = await useFetch<{ items: ActivityItem[] }>('/api/activity');
 
 onMounted(() => {
-	const t = setInterval(refresh, 2_000);
+	const t = setInterval(refresh, 10_000);
 	onUnmounted(() => clearInterval(t));
 });
 
@@ -105,7 +105,7 @@ function open(group: SessionGroup) {
 		<div class="page-header">
 			<div>
 				<h1 class="page-title">Activity</h1>
-				<p class="page-subtitle">Recent conversations across all Claude Code sessions · auto-refreshes every 2s</p>
+				<p class="page-subtitle">Recent conversations across all Claude Code sessions · auto-refreshes every 10s</p>
 			</div>
 			<div class="page-header-right">
 				<span class="total-badge">{{ sessions.length }} sessions</span>

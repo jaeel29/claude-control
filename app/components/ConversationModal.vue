@@ -19,7 +19,7 @@ interface ActivityItem {
 }
 
 interface OutputLine {
-	type: 'text' | 'tool' | 'error' | 'system' | 'done';
+	type: 'user' | 'text' | 'tool' | 'error' | 'system' | 'done';
 	content: string;
 	toolName?: string;
 	exitCode?: number;
@@ -97,7 +97,7 @@ async function send() {
 	const prompt = followUp.value.trim();
 	followUp.value = '';
 	isRunning.value = true;
-	liveOutput.value = [];
+	liveOutput.value = [{ type: 'user', content: prompt }];
 
 	try {
 		const res = await $fetch<{ runId: string }>('/api/run', {
@@ -155,15 +155,16 @@ function msgTime(ts: string) {
 		position="right"
 		:title="item?.project || 'Conversation'"
 		@update:model-value="$emit('update:modelValue', $event)"
+		:draggable="false"
 	>
 		<div v-if="item" class="drawer-inner">
 
 			<!-- Session meta -->
 			<div class="meta-section">
-				<div class="meta-row">
+				<!-- <div class="meta-row">
 					<span class="meta-label">Project</span>
 					<code class="meta-code">{{ item.project }}</code>
-				</div>
+				</div> -->
 				<div class="meta-row">
 					<span class="meta-label">Started</span>
 					<span class="meta-value">{{ fullDate(item.timestamp) }}</span>
@@ -189,6 +190,11 @@ function msgTime(ts: string) {
 							<span class="tool-name-sm">{{ msg.toolName }}</span>
 							<span class="tool-detail-sm">{{ msg.fullText }}</span>
 						</div>
+						<!-- System interruption notice -->
+						<div v-else-if="msg.fullText.startsWith('[Request interrupted')" class="chat-interrupted">
+							<Icon name="lucide:ban" size="11" />
+							{{ msg.fullText.replace(/^\[|\]$/g, '') }}
+						</div>
 						<!-- User / assistant bubble -->
 						<div v-else class="chat-row" :class="msg.role">
 							<div class="avatar" :class="msg.role">
@@ -203,8 +209,17 @@ function msgTime(ts: string) {
 
 					<!-- Live output inline in chat -->
 					<template v-for="(line, i) in liveOutput" :key="'live-' + i">
+						<!-- User message bubble -->
+						<div v-if="line.type === 'user'" class="chat-row user">
+							<div class="avatar user">
+								<Icon name="lucide:user" size="13" mode="svg" />
+							</div>
+							<div class="bubble-wrap">
+								<div class="bubble user">{{ line.content }}</div>
+							</div>
+						</div>
 						<!-- Tool call pill -->
-						<div v-if="line.type === 'tool'" class="chat-tool">
+						<div v-else-if="line.type === 'tool'" class="chat-tool">
 							<div class="tool-icon-sm" />
 							<span class="tool-name-sm">{{ line.toolName }}</span>
 							<span class="tool-detail-sm">{{ line.content }}</span>
@@ -396,6 +411,15 @@ function msgTime(ts: string) {
 	align-self: center;
 }
 .chat-done.failed { color: #e53e3e; }
+.chat-interrupted {
+	display: flex; align-items: center; gap: 5px;
+	align-self: center;
+	font-size: 11px; color: var(--text-muted);
+	background: var(--bg-surface);
+	border: 1px solid var(--border);
+	border-radius: 20px;
+	padding: 3px 10px;
+}
 
 /* Typing indicator */
 .bubble.typing {

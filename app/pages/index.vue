@@ -34,7 +34,7 @@ interface Session {
 const { data, refresh } = await useFetch('/api/home');
 
 onMounted(() => {
-	const t = setInterval(refresh, 2_000);
+	const t = setInterval(refresh, 10_000);
 	onUnmounted(() => clearInterval(t));
 });
 

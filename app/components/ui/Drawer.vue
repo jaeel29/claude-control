@@ -45,6 +45,7 @@ interface Props {
 	modelValue?: boolean;
 	position?: 'left' | 'right' | 'top' | 'bottom';
 	dismissable?: boolean;
+	draggable?: boolean;
 	title?: string;
 }
 
@@ -52,6 +53,7 @@ const props = withDefaults(defineProps<Props>(), {
 	modelValue: undefined,
 	position: 'bottom',
 	dismissable: true,
+	draggable: true,
 	title: undefined,
 });
 
@@ -107,7 +109,7 @@ const drawerStyle = computed(() => {
 });
 
 const shouldDrag = (): boolean => {
-	if (!props.dismissable || !drawerContent.value) return false;
+	if (!props.dismissable || !props.draggable || !drawerContent.value) return false;
 	const body = drawerContent.value.querySelector('.drawer-body') as HTMLElement;
 	if (!body) return true;
 	if (props.position === 'bottom') return body.scrollTop === 0;
