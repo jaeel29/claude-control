@@ -1,11 +1,11 @@
-import { readdir } from 'node:fs/promises'
-import { existsSync } from 'node:fs'
+import { readdir, stat } from 'node:fs/promises'
+import { existsSync, createReadStream } from 'node:fs'
 import { join } from 'node:path'
 import { homedir } from 'node:os'
+import { createInterface } from 'node:readline'
 import { getGlobalAgents, getProjectAgents } from '../utils/agents'
-import { getRunningSessions } from '../utils/sessions'
+import { getRunningSessions2 } from '../utils/sessions'
 import { getRecentActivity } from '../utils/activity'
-import { getSessionLog } from '../utils/sessionlog'
 
 async function getTotalProjects(): Promise<number> {
   const dir = join(homedir(), '.claude', 'projects')
@@ -16,14 +16,72 @@ async function getTotalProjects(): Promise<number> {
   } catch { return 0 }
 }
 
+async function getTodayStats() {
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  const todayMs = todayStart.getTime()
+
+  const projectsDir = join(homedir(), '.claude', 'projects')
+  if (!existsSync(projectsDir)) return { filesModifiedToday: 0, toolCallsToday: 0, commandsRunToday: 0 }
+
+  const modifiedFiles = new Set<string>()
+  const commandsToday = new Set<string>()
+  let toolCallsToday = 0
+
+  try {
+    const projects = await readdir(projectsDir)
+    await Promise.all(projects.map(async proj => {
+      const projDir = join(projectsDir, proj)
+      let files: string[] = []
+      try { files = (await readdir(projDir)).filter(f => f.endsWith('.jsonl')) } catch { return }
+
+      // Only process files modified today
+      const todayFiles = (await Promise.all(
+        files.map(async f => {
+          try { return { f, mtime: (await stat(join(projDir, f))).mtimeMs } }
+          catch { return null }
+        })
+      )).filter((x): x is { f: string; mtime: number } => !!x && x.mtime >= todayMs)
+
+      await Promise.all(todayFiles.map(async ({ f }) => {
+        const filePath = join(projDir, f)
+        try {
+          const rl = createInterface({ input: createReadStream(filePath), crlfDelay: Infinity })
+          for await (const line of rl) {
+            try {
+              const e = JSON.parse(line)
+              if (e.type !== 'assistant' || !Array.isArray(e.message?.content)) continue
+              if (!e.timestamp || new Date(e.timestamp).getTime() < todayMs) continue
+              for (const block of e.message.content) {
+                if (block.type !== 'tool_use') continue
+                toolCallsToday++
+                const name: string = block.name
+                if (name === 'Write' && block.input?.file_path) modifiedFiles.add(block.input.file_path)
+                if ((name === 'Edit' || name === 'MultiEdit') && block.input?.file_path) modifiedFiles.add(block.input.file_path)
+                if (name === 'Bash' && block.input?.command) commandsToday.add(String(block.input.command).slice(0, 120))
+              }
+            } catch { /* skip */ }
+          }
+        } catch { /* skip */ }
+      }))
+    }))
+  } catch { /* ignore */ }
+
+  return {
+    filesModifiedToday: modifiedFiles.size,
+    toolCallsToday,
+    commandsRunToday: commandsToday.size,
+  }
+}
+
 export default defineEventHandler(async () => {
-  const [globalAgents, projectAgents, sessions, activity, totalProjects, sessionLog] = await Promise.all([
+  const [globalAgents, projectAgents, sessions, activity, totalProjects, todayStats] = await Promise.all([
     getGlobalAgents(),
     getProjectAgents(),
-    Promise.resolve(getRunningSessions()),
+    getRunningSessions2(),
     getRecentActivity(50),
     getTotalProjects(),
-    getSessionLog(30),
+    getTodayStats(),
   ])
 
   const runningIds = new Set(sessions.map(s => s.sessionId).filter(Boolean))
@@ -34,26 +92,7 @@ export default defineEventHandler(async () => {
   todayStart.setHours(0, 0, 0, 0)
   const promptsToday = activity.filter(a => new Date(a.timestamp) >= todayStart).length
 
-  // Files modified: unique files edited+written across recent sessions active today
-  const todaySessions = sessionLog.filter(s => new Date(s.lastActiveAt) >= todayStart)
-  const modifiedFiles = new Set<string>()
-  for (const s of todaySessions) {
-    s.filesEdited.forEach(f => modifiedFiles.add(f))
-    s.filesWritten.forEach(f => modifiedFiles.add(f))
-  }
-  const filesModifiedToday = modifiedFiles.size
-
-  // Tool calls today: sum all tool calls across sessions active today
-  const toolCallsToday = todaySessions.reduce((sum, s) => {
-    return sum + Object.values(s.toolCalls).reduce((a, b) => a + b, 0)
-  }, 0)
-
-  // Commands run today: unique bash commands across sessions active today
-  const commandsToday = new Set<string>()
-  for (const s of todaySessions) {
-    s.commandsRun.forEach(c => commandsToday.add(c))
-  }
-  const commandsRunToday = commandsToday.size
+  const { filesModifiedToday, toolCallsToday, commandsRunToday } = todayStats
 
   return {
     stats: {

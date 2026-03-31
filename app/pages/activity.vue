@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 interface ConversationMessage {
-	role: 'user' | 'assistant';
+	role: 'user' | 'assistant' | 'tool';
 	text: string;
 	fullText: string;
 	timestamp: string;
+	toolName?: string;
 }
 
 interface ActivityItem {
@@ -12,15 +14,19 @@ interface ActivityItem {
 	timestamp: string;
 	project: string;
 	sessionId: string;
+	cwd: string;
 	isRunning: boolean;
+	aiTitle: string | null;
 	messages: ConversationMessage[];
 }
 
 interface SessionGroup {
 	sessionId: string;
 	project: string;
+	cwd: string;
 	isRunning: boolean;
 	firstPrompt: string;
+	aiTitle: string | null;
 	promptCount: number;
 	messageCount: number;
 	lastTimestamp: string;
@@ -30,21 +36,24 @@ interface SessionGroup {
 const { data, refresh } = await useFetch<{ items: ActivityItem[] }>('/api/activity');
 
 onMounted(() => {
-	const t = setInterval(refresh, 15_000);
+	const t = setInterval(refresh, 2_000);
 	onUnmounted(() => clearInterval(t));
 });
 
 // Group individual turns into one row per session
 const sessions = computed<SessionGroup[]>(() => {
 	const map = new Map<string, SessionGroup>();
+	// items are sorted newest-first from the API
 	for (const item of data.value?.items ?? []) {
-		const key = item.sessionId || item.timestamp; // fallback if no sessionId
+		const key = item.sessionId || item.timestamp;
 		if (!map.has(key)) {
 			map.set(key, {
 				sessionId: item.sessionId,
 				project: item.project,
+				cwd: item.cwd,
 				isRunning: item.isRunning,
 				firstPrompt: item.text,
+				aiTitle: item.aiTitle ?? null,
 				promptCount: 0,
 				messageCount: 0,
 				lastTimestamp: item.timestamp,
@@ -55,30 +64,37 @@ const sessions = computed<SessionGroup[]>(() => {
 		g.isRunning = g.isRunning || item.isRunning;
 		g.promptCount += 1;
 		g.messageCount += item.messages.length;
-		// items are newest-first, so the last one we see is the oldest — keep first timestamp as latest
 		g.allMessages.push(...item.messages);
 	}
-	return [...map.values()];
+	// running sessions first, then most recent
+	return [...map.values()].sort((a, b) => {
+		if (a.isRunning !== b.isRunning) return a.isRunning ? -1 : 1;
+		return new Date(b.lastTimestamp).getTime() - new Date(a.lastTimestamp).getTime();
+	});
 });
 
-const selected = ref<SessionGroup | null>(null);
+const selectedId = ref<string | null>(null);
 const showModal = ref(false);
 
-// Build a synthetic ActivityItem for ConversationModal
+// Always derived from live sessions — updates automatically on each refresh
 const selectedAsItem = computed(() => {
-	if (!selected.value) return null;
+	if (!selectedId.value) return null;
+	const g = sessions.value.find(s => s.sessionId === selectedId.value);
+	if (!g) return null;
 	return {
-		text: selected.value.firstPrompt,
-		fullText: selected.value.firstPrompt,
-		timestamp: selected.value.lastTimestamp,
-		project: selected.value.project,
-		sessionId: selected.value.sessionId,
-		messages: selected.value.allMessages,
+		text: g.firstPrompt,
+		fullText: g.firstPrompt,
+		timestamp: g.lastTimestamp,
+		project: g.project,
+		cwd: g.cwd,
+		sessionId: g.sessionId,
+		aiTitle: g.aiTitle,
+		messages: [...g.allMessages].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()),
 	};
 });
 
 function open(group: SessionGroup) {
-	selected.value = group;
+	selectedId.value = group.sessionId;
 	showModal.value = true;
 }
 
@@ -89,7 +105,7 @@ function open(group: SessionGroup) {
 		<div class="page-header">
 			<div>
 				<h1 class="page-title">Activity</h1>
-				<p class="page-subtitle">Recent conversations across all Claude Code sessions · auto-refreshes every 15s</p>
+				<p class="page-subtitle">Recent conversations across all Claude Code sessions · auto-refreshes every 2s</p>
 			</div>
 			<div class="page-header-right">
 				<span class="total-badge">{{ sessions.length }} sessions</span>

@@ -88,15 +88,16 @@ onUnmounted(() => document.removeEventListener('mousedown', outside));
 	justify-content: space-between;
 	gap: 6px;
 	padding: 5px 8px;
-	width: 168px;
+	min-width: 120px;
+	height: 32px;
 	background: #fff;
-	// border: 1px solid #b1b1b1;
+	border: none;
 	border-radius: 8px;
 	font-size: 12px;
 	font-weight: 500;
 	color: #414746;
 	cursor: pointer;
-	box-shadow: 0 1px 2px #656565;
+	box-shadow: 0 0 0px 1px #cdcdcd;
 	transition: border-color 0.15s;
 
 	[data-theme='dark'] & {

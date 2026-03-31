@@ -13,9 +13,11 @@ const nav = [
   { label: 'Overview',  href: '/',         icon: 'lucide:layout-dashboard' },
   { label: 'Activity',  href: '/activity',  icon: 'lucide:activity' },
   { label: 'Agents',    href: '/agents',    icon: 'lucide:bot' },
-  { label: 'Tasks',     href: '/tasks',     icon: 'lucide:check-square' },
+  // { label: 'Tasks',     href: '/tasks',     icon: 'lucide:check-square' },
   { label: 'Logs',      href: '/logs',      icon: 'lucide:scroll-text' },
   { label: 'Run',       href: '/run',       icon: 'lucide:send' },
+  { label: 'Usage',     href: '/usage',     icon: 'lucide:bar-chart-2' },
+  { label: 'Test',      href: '/test',      icon: 'lucide:flask-conical' },
 ]
 
 const PROJECT_COLORS = [

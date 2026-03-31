@@ -1,4 +1,8 @@
 import { execSync, execFileSync } from 'node:child_process'
+import { readdir, stat, readFile } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
+import { homedir } from 'node:os'
 
 export interface Session {
   pid: number
@@ -27,6 +31,45 @@ function getCwd(pid: number): string {
   } catch { return '' }
 }
 
+// Encode a cwd path to the ~/.claude/projects/ folder name format
+function cwdToProjectDir(cwd: string): string {
+  return cwd.replace(/\//g, '-')
+}
+
+// Read the most recent sessionId from the latest JSONL in the project dir
+async function resolveSessionId(cwd: string): Promise<string | null> {
+  try {
+    const projectsDir = join(homedir(), '.claude', 'projects')
+    const encoded = cwdToProjectDir(cwd)
+    const projDir = join(projectsDir, encoded)
+    if (!existsSync(projDir)) return null
+
+    const files = (await readdir(projDir)).filter(f => f.endsWith('.jsonl'))
+    if (!files.length) return null
+
+    // Find most recently modified file
+    const withMtime = await Promise.all(
+      files.map(async f => {
+        try { return { f, mtime: (await stat(join(projDir, f))).mtimeMs } }
+        catch { return { f, mtime: 0 } }
+      })
+    )
+    const latest = withMtime.sort((a, b) => b.mtime - a.mtime)[0]
+    if (!latest) return null
+
+    // Read last few lines to find a sessionId
+    const content = await readFile(join(projDir, latest.f), 'utf8')
+    const lines = content.split('\n').filter(Boolean).slice(-50)
+    for (let i = lines.length - 1; i >= 0; i--) {
+      try {
+        const e = JSON.parse(lines[i])
+        if (e.sessionId) return e.sessionId as string
+      } catch { /* skip */ }
+    }
+    return null
+  } catch { return null }
+}
+
 export function getRunningSessions(): Session[] {
   try {
     const out = execSync('ps aux', { encoding: 'utf8' })
@@ -40,7 +83,6 @@ export function getRunningSessions(): Session[] {
       const pid = parseInt(parts[1])
       const elapsed = parts[9] ?? ''
 
-      // Parse flags from the full command line
       const modeMatch = line.match(/--permission-mode\s+(\S+)/)
       const mode = modeMatch ? modeMatch[1] : 'default'
 
@@ -50,23 +92,15 @@ export function getRunningSessions(): Session[] {
       const sourcesMatch = line.match(/--setting-sources\s+(\S+)/)
       const settingSources = sourcesMatch ? sourcesMatch[1] : ''
 
-      // Reconstruct the args list (excluding the binary path)
       const cmdStart = line.indexOf('native-binary/claude')
       const rawArgs = cmdStart >= 0 ? line.slice(cmdStart).split(/\s+/).slice(1) : []
 
-      // Get real cwd via lsof
       const cwd = getCwd(pid)
       const project = cwd ? cwd.split('/').pop() ?? '' : `PID ${pid}`
 
       sessions.push({
-        pid,
-        cwd,
-        project,
-        mode,
-        elapsed,
-        sessionId,
-        resume: !!sessionId,
-        settingSources,
+        pid, cwd, project, mode, elapsed, sessionId,
+        resume: !!sessionId, settingSources,
         args: rawArgs.filter(a => a.length > 0),
       })
     }
@@ -75,4 +109,18 @@ export function getRunningSessions(): Session[] {
   } catch {
     return []
   }
+}
+
+// Async version that also resolves sessionIds from JSONL for fresh sessions
+export async function getRunningSessions2(): Promise<Session[]> {
+  const sessions = getRunningSessions()
+  await Promise.all(
+    sessions
+      .filter(s => !s.sessionId && s.cwd)
+      .map(async s => {
+        const id = await resolveSessionId(s.cwd)
+        if (id) s.sessionId = id
+      })
+  )
+  return sessions
 }

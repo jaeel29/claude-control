@@ -1,9 +1,10 @@
 <script setup lang="ts">
 interface ConversationMessage {
-	role: 'user' | 'assistant';
+	role: 'user' | 'assistant' | 'tool';
 	text: string;
 	fullText: string;
 	timestamp: string;
+	toolName?: string;
 }
 
 interface ActivityItem {
@@ -12,7 +13,9 @@ interface ActivityItem {
 	timestamp: string;
 	project: string;
 	sessionId: string;
+	cwd: string;
 	isRunning: boolean;
+	aiTitle: string | null;
 	messages: ConversationMessage[];
 }
 
@@ -31,7 +34,7 @@ interface Session {
 const { data, refresh } = await useFetch('/api/home');
 
 onMounted(() => {
-	const t = setInterval(refresh, 10_000);
+	const t = setInterval(refresh, 2_000);
 	onUnmounted(() => clearInterval(t));
 });
 
@@ -53,8 +56,10 @@ const activitySessions = computed<SessionGroup[]>(() => {
 			map.set(key, {
 				sessionId: item.sessionId,
 				project: item.project,
+				cwd: item.cwd,
 				isRunning: item.isRunning,
 				firstPrompt: item.text,
+				aiTitle: item.aiTitle ?? null,
 				promptCount: 0,
 				messageCount: 0,
 				lastTimestamp: item.timestamp,
@@ -67,26 +72,35 @@ const activitySessions = computed<SessionGroup[]>(() => {
 		g.messageCount += item.messages.length;
 		g.allMessages.push(...item.messages);
 	}
-	return [...map.values()].slice(0, 5);
+	return [...map.values()]
+		.sort((a, b) => {
+			if (a.isRunning !== b.isRunning) return a.isRunning ? -1 : 1;
+			return new Date(b.lastTimestamp).getTime() - new Date(a.lastTimestamp).getTime();
+		})
+		.slice(0, 5);
 });
 
-const selectedActivity = ref<SessionGroup | null>(null);
+const selectedActivityId = ref<string | null>(null);
 const showActivityModal = ref(false);
 
 const selectedActivityAsItem = computed(() => {
-	if (!selectedActivity.value) return null;
+	if (!selectedActivityId.value) return null;
+	const g = activitySessions.value.find(s => s.sessionId === selectedActivityId.value);
+	if (!g) return null;
 	return {
-		text: selectedActivity.value.firstPrompt,
-		fullText: selectedActivity.value.firstPrompt,
-		timestamp: selectedActivity.value.lastTimestamp,
-		project: selectedActivity.value.project,
-		sessionId: selectedActivity.value.sessionId,
-		messages: selectedActivity.value.allMessages,
+		text: g.firstPrompt,
+		fullText: g.firstPrompt,
+		timestamp: g.lastTimestamp,
+		project: g.project,
+		cwd: g.cwd,
+		sessionId: g.sessionId,
+		aiTitle: g.aiTitle,
+		messages: [...g.allMessages].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()),
 	};
 });
 
 function openActivity(group: SessionGroup) {
-	selectedActivity.value = group;
+	selectedActivityId.value = group.sessionId;
 	showActivityModal.value = true;
 }
 

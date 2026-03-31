@@ -2,16 +2,19 @@
 export interface SessionGroup {
 	sessionId: string;
 	project: string;
+	cwd: string;
 	isRunning: boolean;
 	firstPrompt: string;
+	aiTitle: string | null;
 	promptCount: number;
 	messageCount: number;
 	lastTimestamp: string;
 	allMessages: {
-		role: 'user' | 'assistant';
+		role: 'user' | 'assistant' | 'tool';
 		text: string;
 		fullText: string;
 		timestamp: string;
+		toolName?: string;
 	}[];
 }
 
@@ -29,8 +32,12 @@ function relativeTime(ts: string) {
 
 function formatText(text: string) {
 	return text
-		.replace(/<ide_opened_file>[\s\S]*?opened the file ([^\s<]+)[\s\S]*?<\/ide_opened_file>/g, (_, p) => `@${p.split('/').pop()}`)
+		// strip <ide_opened_file> whether or not the closing tag is present (text may be truncated)
+		.replace(/<ide_opened_file>[\s\S]*?<\/ide_opened_file>/g, '')
+		.replace(/<ide_opened_file>[\s\S]*/g, '')
+		// strip any other XML-style tags
 		.replace(/<[^>]+>[\s\S]*?<\/[^>]+>/g, '')
+		.replace(/<[^>]+>/g, '')
 		.replace(/```[\s\S]*?```/g, '[code block]')
 		.replace(/`([^`]+)`/g, '$1')
 		.replace(/\*\*(.+?)\*\*/g, '$1')
