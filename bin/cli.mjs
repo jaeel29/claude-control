@@ -18,6 +18,7 @@ import { homedir, networkInterfaces } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { randomBytes } from 'node:crypto'
+import { renderUnicodeCompact } from 'uqr'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PKG_ROOT = join(__dirname, '..')
@@ -151,13 +152,20 @@ const env = {
   CC_ALLOW_REMOTE_RUN: args.allowRemoteRun ? '1' : '0',
 }
 
+// Phone URL points straight at the login page with the token pre-filled, so a
+// QR scan lands the user authenticated — no manual typing on a phone keyboard.
+const phoneUrl = networkHost
+  ? `http://${networkHost}:${args.port}/login?token=${encodeURIComponent(token)}`
+  : null
+
 console.log('')
 console.log('  claudecontrolai')
 console.log('  ──────────────────────────────────────────')
 console.log(`  computer:    http://localhost:${args.port}`)
 if (remote) {
-  if (networkHost) {
-    console.log(`  phone:       http://${networkHost}:${args.port}   (open this on your phone)`)
+  if (phoneUrl) {
+    console.log(`  phone:       ${phoneUrl}`)
+    console.log('               (open this on your phone, or scan the QR below)')
   } else {
     console.log('  phone:       (no network address found)')
   }
@@ -165,6 +173,16 @@ if (remote) {
   console.log(`  remote run:  ${args.allowRemoteRun ? 'ENABLED ⚠️  (can execute code remotely)' : 'view-only'}`)
   if (args.bind === 'public') {
     console.log('  ⚠️  public bind exposes this host on your network — use a firewall.')
+  }
+  if (phoneUrl) {
+    console.log('  ──────────────────────────────────────────')
+    console.log('  Scan to open on your phone:')
+    console.log('')
+    // Indent each QR line so it sits under the banner.
+    for (const line of renderUnicodeCompact(phoneUrl).split('\n')) {
+      console.log('    ' + line)
+    }
+    console.log('')
   }
 } else {
   console.log('  phone:       run with --bind lan (same Wi-Fi) or --bind tailnet')

@@ -50,6 +50,16 @@ async function submit() {
 		loading.value = false;
 	}
 }
+
+// A token passed in the URL (e.g. from the terminal QR code) pre-fills the
+// field and submits automatically, so a phone scan lands signed in.
+onMounted(() => {
+	const t = route.query.token;
+	if (typeof t === 'string' && t.trim()) {
+		token.value = t.trim();
+		submit();
+	}
+});
 </script>
 
 <style scoped lang="scss">
