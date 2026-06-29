@@ -34,9 +34,22 @@
 		<!-- Sticky header: the current turn's user prompt stays visible while you
 		     scroll its replies. Only the latest prompt above the viewport shows;
 		     earlier ones release. -->
-		<div v-if="current && stickyPrompt" class="cc-sticky">
+		<div v-if="current && (stickyPrompt.text || stickyPrompt.images.length)" class="cc-sticky">
 			<span class="cc-user__caret">&gt;</span>
-			<span class="cc-sticky__text">{{ stickyPrompt }}</span>
+			<div class="cc-sticky__body">
+				<span v-if="stickyText" class="cc-sticky__text">{{ stickyText }}</span>
+				<div v-if="stickyPrompt.images.length" class="cc-thumbs">
+					<img
+						v-for="idx in stickyPrompt.images"
+						:key="'sticky-' + idx"
+						class="cc-thumb"
+						:src="`/api/session/${currentSessionId}/image/${idx}`"
+						alt="attached image"
+						loading="lazy"
+						@click="lightbox = `/api/session/${currentSessionId}/image/${idx}`"
+					/>
+				</div>
+			</div>
 		</div>
 
 		<!-- Transcript (Claude Code CLI style) -->
@@ -54,7 +67,7 @@
 						⎿ {{ msg.display }}
 					</div>
 					<!-- User prompt -->
-					<div v-else-if="msg.kind === 'user'" class="cc-user" :data-user-prompt="msg.display || 'image'">
+					<div v-else-if="msg.kind === 'user'" class="cc-user" :data-user-prompt="msg.display || 'image'" :data-user-images="msg.images?.join(',') || ''">
 						<span class="cc-user__caret">&gt;</span>
 						<div class="cc-user__body">
 							<span v-if="msg.display" class="cc-user__text">{{ msg.display }}</span>
@@ -323,22 +336,35 @@ function scrollChat() {
 }
 
 // The user prompt of the turn currently in view — shown in the sticky header.
-const stickyPrompt = ref('');
+// Carries both the text and any attached image indices so the sticky header can
+// render the same clickable thumbnails as the inline row.
+const stickyPrompt = ref<{ text: string; images: number[] }>({ text: '', images: [] });
+// When the current turn has thumbnails, drop the "🖼 image" placeholder text so
+// only the real thumbnails show (and any actual prompt text alongside them).
+const stickyText = computed(() => {
+	const t = stickyPrompt.value.text;
+	if (!stickyPrompt.value.images.length) return t;
+	const stripped = t.replace(/🖼 image/g, '').replace(/\s+/g, ' ').trim();
+	return stripped;
+});
 function updateStickyPrompt() {
 	const el = chatEl.value;
 	if (!el) return;
 	const top = el.getBoundingClientRect().top;
 	const prompts = el.querySelectorAll<HTMLElement>('[data-user-prompt]');
-	let label = '';
+	let text = '';
+	let images: number[] = [];
 	// The latest prompt whose top is at or above the container top is the current turn.
 	for (const p of prompts) {
 		if (p.getBoundingClientRect().top - top <= 8) {
-			label = p.dataset.userPrompt || '';
+			text = p.dataset.userPrompt || '';
+			const raw = p.dataset.userImages || '';
+			images = raw ? raw.split(',').map((s) => Number(s)).filter((n) => Number.isInteger(n)) : [];
 		} else {
 			break;
 		}
 	}
-	stickyPrompt.value = label;
+	stickyPrompt.value = { text, images };
 }
 
 let scrollRaf = 0;
@@ -746,6 +772,13 @@ onMounted(() => {
 	.cc-user__caret {
 		color: var(--accent, #00b695);
 		font-weight: 700;
+	}
+
+	&__body {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		min-width: 0;
 	}
 
 	&__text {
