@@ -54,11 +54,11 @@ const faqs = [
 	},
 	{
 		q: 'How do I open it on my phone?',
-		a: 'Install Tailscale (free) on your computer and phone, then run: npx claudecontrolai --bind tailnet. It prints a private link and an access token — open the link on your phone and enter the token. Your computer must stay awake. Remote is view-only unless you add --allow-remote-run.',
+		a: 'On the same Wi-Fi, run: npx claudecontrolai --bind lan — it prints a phone URL and an access token; open that URL on your phone and enter the token. To reach it from anywhere, use --bind tailnet (Tailscale). Your computer must stay awake; remote is view-only unless you add --allow-remote-run.',
 	},
 	{
 		q: 'What do I need to get started?',
-		a: 'Node 20 or newer and the Claude Code CLI you already use. For phone access, add Tailscale. That is everything.',
+		a: 'Node 20 or newer and the Claude Code CLI you already use. That is everything — phone access on the same Wi-Fi needs no extra software.',
 	},
 ];
 

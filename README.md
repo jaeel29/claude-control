@@ -1,4 +1,4 @@
-# claudecontrol
+# Claude Control
 
 A local dashboard for your [Claude Code](https://claude.com/claude-code) sessions — live activity, history, and cost, right in your browser.
 
@@ -10,7 +10,7 @@ npx claudecontrolai
 
 Then open **http://localhost:3001**.
 
-> Not comfortable with the terminal? Just tell **Claude Code**: *"install and run claudecontrolai"* and it will do it for you.
+> Not comfortable with the terminal? Just tell **Claude Code**: _"install and run claudecontrolai"_ and it will do it for you.
 
 ---
 
@@ -33,7 +33,7 @@ Then open **http://localhost:3001**.
 ```bash
 npx claudecontrolai                  # start on http://localhost:3001
 npx claudecontrolai --port 4000      # use a different port
-npx claudecontrolai --bind tailnet   # reach it from your phone (see below)
+npx claudecontrolai --bind lan       # also reach it from your phone (same Wi-Fi)
 npx claudecontrolai --help           # show options
 ```
 
@@ -42,21 +42,29 @@ The dashboard polls your local Claude Code data and refreshes automatically.
 ## Track Claude Code from your phone
 
 Your sessions live on your computer, so the dashboard runs there — but you can
-open it on your phone's browser over your own private network using
-[Tailscale](https://tailscale.com) (free):
+open it on your phone's browser too.
 
-1. Install Tailscale on **your computer and your phone**, and sign in to the same
-   account on both (`tailscale up` on the computer).
-2. Start the dashboard bound to your tailnet:
+**Same Wi-Fi (easiest, no extra software):**
 
-   ```bash
-   npx claudecontrolai --bind tailnet
-   ```
+```bash
+npx claudecontrolai --bind lan
+```
 
-3. The terminal prints a **private URL** (a `100.x.y.z` address) and an **access
-   token**. Open that URL in your phone's browser and enter the token.
+The terminal prints a **phone URL** (your computer's LAN address, e.g.
+`http://192.168.x.x:3001`) and an **access token**. Open that URL on your phone
+(connected to the same Wi-Fi) and enter the token.
+
+**From anywhere (via [Tailscale](https://tailscale.com), free):**
+
+```bash
+npx claudecontrolai --bind tailnet
+```
+
+Install Tailscale on your computer and phone, sign in on both, then use the
+`100.x.y.z` URL it prints.
 
 Notes:
+
 - It only works while your **computer is awake and online** — there's no cloud copy.
 - Remote access is **view-only by default** (you can watch, not run). To also start
   or stop runs from your phone, add `--allow-remote-run`.

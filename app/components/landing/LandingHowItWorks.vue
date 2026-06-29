@@ -12,7 +12,7 @@
 
 		<div class="how__phone">
 			<p class="how__phone-label">To open it on your phone, start it like this instead:</p>
-			<LandingCommandBlock command="npx claudecontrolai --bind tailnet" label="phone access" />
+			<LandingCommandBlock command="npx claudecontrolai --bind lan" label="phone access" />
 		</div>
 	</section>
 </template>
@@ -34,7 +34,7 @@ const steps = [
 	{
 		n: '3',
 		title: 'Add your phone (optional)',
-		body: 'Want to check it on the go? Run it with --bind tailnet and open the same dashboard on your phone over your private Tailscale network.',
+		body: 'Want to check it on the go? Run it with --bind lan and open the same dashboard on your phone — same Wi-Fi, no extra setup.',
 	},
 ];
 </script>

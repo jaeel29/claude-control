@@ -23,7 +23,6 @@ const { repoUrl } = useSite();
 	max-width: 1100px;
 	margin: 0 auto;
 	padding: 40px 24px;
-	border-top: 1px solid var(--color-border);
 	display: flex;
 	align-items: center;
 	justify-content: space-between;

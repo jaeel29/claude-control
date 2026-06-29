@@ -45,15 +45,17 @@ Usage:
   claudecontrolai [options]
 
 Options:
-  --bind <mode>          localhost (default) | tailnet | public
+  --bind <mode>          localhost (default) | lan | tailnet | public
+                           lan     = same Wi-Fi — open it on your phone, no setup
+                           tailnet = your private Tailscale network (anywhere)
   --port <n>             port to listen on (default 3001)
   --token <secret>       access token for remote auth (auto-generated if omitted)
   --allow-remote-run     permit starting/stopping Claude over the network
                          (default: remote is view-only)
   -h, --help             show this help
 
-Local use needs no account. For phone access, install Tailscale on your
-computer and phone, then run with --bind tailnet.
+Local use needs no account. To open it on your phone on the same Wi-Fi:
+  npx claudecontrolai --bind lan
 `)
 }
 
@@ -91,6 +93,17 @@ function tailscaleIp() {
   return null
 }
 
+// First non-internal IPv4 (the machine's LAN address) — for phone access on the
+// same Wi-Fi without Tailscale.
+function lanIp() {
+  for (const list of Object.values(networkInterfaces())) {
+    for (const ni of list || []) {
+      if (ni.family === 'IPv4' && !ni.internal) return ni.address
+    }
+  }
+  return null
+}
+
 const args = parseArgs(process.argv.slice(2))
 if (args.help) { help(); process.exit(0) }
 
@@ -102,21 +115,25 @@ if (!existsSync(entry)) {
 }
 
 let host = '127.0.0.1'
-let displayHost = 'localhost'
+let networkHost = null   // address to show for "open this on your phone"
 let remote = false
 
-if (args.bind === 'tailnet') {
+if (args.bind === 'lan') {
+  // All interfaces → reachable on the computer (localhost) AND on phones on the
+  // same Wi-Fi (the LAN IP). Same server, both work, no extra software.
+  host = '0.0.0.0'; networkHost = lanIp(); remote = true
+} else if (args.bind === 'tailnet') {
   const ip = tailscaleIp()
   if (!ip) {
     console.error('✖ Could not find a Tailscale IP.')
     console.error('  Install Tailscale and run `tailscale up` first: https://tailscale.com/download')
     process.exit(1)
   }
-  host = ip; displayHost = ip; remote = true
+  host = ip; networkHost = ip; remote = true
 } else if (args.bind === 'public') {
-  host = '0.0.0.0'; displayHost = '0.0.0.0'; remote = true
+  host = '0.0.0.0'; networkHost = lanIp(); remote = true
 } else if (args.bind !== 'localhost') {
-  console.error(`✖ Unknown --bind value: ${args.bind} (expected localhost | tailnet | public)`)
+  console.error(`✖ Unknown --bind value: ${args.bind} (expected localhost | lan | tailnet | public)`)
   process.exit(1)
 }
 
@@ -134,20 +151,23 @@ const env = {
   CC_ALLOW_REMOTE_RUN: args.allowRemoteRun ? '1' : '0',
 }
 
-const localUrl = `http://localhost:${args.port}`
 console.log('')
 console.log('  claudecontrolai')
 console.log('  ──────────────────────────────────────────')
-console.log(`  local:       ${localUrl}`)
+console.log(`  computer:    http://localhost:${args.port}`)
 if (remote) {
-  console.log(`  remote:      http://${displayHost}:${args.port}   (open this on your phone)`)
+  if (networkHost) {
+    console.log(`  phone:       http://${networkHost}:${args.port}   (open this on your phone)`)
+  } else {
+    console.log('  phone:       (no network address found)')
+  }
   console.log(`  token:       ${token}`)
   console.log(`  remote run:  ${args.allowRemoteRun ? 'ENABLED ⚠️  (can execute code remotely)' : 'view-only'}`)
   if (args.bind === 'public') {
-    console.log('  ⚠️  public bind exposes this host on your network — use a firewall/tunnel.')
+    console.log('  ⚠️  public bind exposes this host on your network — use a firewall.')
   }
 } else {
-  console.log('  tip:         --bind tailnet to reach it from your phone')
+  console.log('  phone:       run with --bind lan (same Wi-Fi) or --bind tailnet')
 }
 console.log('  ──────────────────────────────────────────')
 console.log('')

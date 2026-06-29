@@ -17,7 +17,10 @@
 		</div>
 
 		<LandingCommandBlock :command="current.command" :label="current.cmdLabel" />
-		<p class="install__hint">{{ current.hint }}</p>
+		<p class="install__hint">
+			{{ current.hint }}
+			<template v-if="current.note"><br /><span class="install__note">{{ current.note }}</span></template>
+		</p>
 	</div>
 </template>
 
@@ -29,11 +32,12 @@ const tabs: { key: TabKey; label: string }[] = [
 	{ key: 'claude', label: 'Claude' },
 ];
 
-const options: Record<TabKey, { command: string; cmdLabel: string; hint: string }> = {
+const options: Record<TabKey, { command: string; cmdLabel: string; hint: string; note?: string }> = {
 	npm: {
 		command: 'npx claudecontrolai',
 		cmdLabel: 'your terminal',
-		hint: 'Run it in your terminal — needs Node 20+. Opens at localhost:3001. Add --bind tailnet to reach it from your phone.',
+		hint: 'Run it in your terminal — needs Node 20+. Opens at localhost:3001.',
+		note: 'Add --bind lan to open it on your phone (same Wi-Fi).',
 	},
 	claude: {
 		command: 'install and run claudecontrolai',
@@ -86,7 +90,11 @@ const current = computed(() => options[active.value]);
 		margin: 14px 0 0;
 		font-size: 13px;
 		color: var(--color-text-muted);
-		line-height: 1.5;
+		line-height: 1.6;
+	}
+
+	&__note {
+		color: var(--color-text-subtle);
 	}
 }
 
