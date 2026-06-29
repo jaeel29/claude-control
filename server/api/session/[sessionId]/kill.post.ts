@@ -1,6 +1,8 @@
 import { getRunningSessions } from '../../../utils/sessions'
+import { assertRunAllowed } from '../../../utils/guard'
 
 export default defineEventHandler(async (event) => {
+  assertRunAllowed(event)
   const sessionId = getRouterParam(event, 'sessionId')
   if (!sessionId) throw createError({ statusCode: 400, message: 'Missing sessionId' })
 

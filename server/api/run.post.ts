@@ -1,7 +1,9 @@
 import { createRun } from '../utils/runManager'
+import { assertRunAllowed } from '../utils/guard'
 import { existsSync } from 'node:fs'
 
 export default defineEventHandler(async (event) => {
+  assertRunAllowed(event)
   const body = await readBody(event)
   const prompt: string = body?.prompt?.trim()
   const cwd: string = body?.cwd?.trim()

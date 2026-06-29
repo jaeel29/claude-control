@@ -2,27 +2,36 @@
 /**
  * claudecontrolai launcher.
  *
- * Boots the prebuilt Nitro server (.output/server/index.mjs) on localhost.
- * This is a local-only tool — it reads your machine's ~/.claude data and shows
- * it in your browser. No accounts, no auth, nothing leaves your computer.
+ * Boots the prebuilt Nitro server (.output/server/index.mjs) and shows your
+ * Claude Code sessions in the browser. Local by default; optional phone access
+ * over your private Tailscale network (Paperclip-style).
  *
- *   npx claudecontrolai            # http://localhost:3001
+ *   npx claudecontrolai                          # http://localhost:3001
+ *   npx claudecontrolai --bind tailnet           # reach it from your phone (token-gated)
+ *   npx claudecontrolai --bind tailnet --allow-remote-run
  *   npx claudecontrolai --port 4000
  */
 
-import { spawn } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { spawn, execSync } from 'node:child_process'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { homedir, networkInterfaces } from 'node:os'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { randomBytes } from 'node:crypto'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const PKG_ROOT = join(__dirname, '..')
+const CONFIG_DIR = join(homedir(), '.claudecontrol')
+const TOKEN_FILE = join(CONFIG_DIR, 'token')
 
 function parseArgs(argv) {
-  const args = { port: 3001 }
+  const args = { bind: 'localhost', port: 3001, token: '', allowRemoteRun: false }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
-    if (a === '--port') args.port = Number(argv[++i])
+    if (a === '--bind') args.bind = argv[++i]
+    else if (a === '--port') args.port = Number(argv[++i])
+    else if (a === '--token') args.token = argv[++i]
+    else if (a === '--allow-remote-run') args.allowRemoteRun = true
     else if (a === '--help' || a === '-h') args.help = true
   }
   return args
@@ -36,11 +45,50 @@ Usage:
   claudecontrolai [options]
 
 Options:
-  --port <n>     port to listen on (default 3001)
-  -h, --help     show this help
+  --bind <mode>          localhost (default) | tailnet | public
+  --port <n>             port to listen on (default 3001)
+  --token <secret>       access token for remote auth (auto-generated if omitted)
+  --allow-remote-run     permit starting/stopping Claude over the network
+                         (default: remote is view-only)
+  -h, --help             show this help
 
-Everything runs on your own computer. No account, no sign-up.
+Local use needs no account. For phone access, install Tailscale on your
+computer and phone, then run with --bind tailnet.
 `)
+}
+
+function loadOrCreateToken(supplied) {
+  if (supplied) return supplied
+  try {
+    if (existsSync(TOKEN_FILE)) {
+      const t = readFileSync(TOKEN_FILE, 'utf8').trim()
+      if (t) return t
+    }
+  } catch {}
+  const t = randomBytes(18).toString('base64url')
+  try {
+    mkdirSync(CONFIG_DIR, { recursive: true })
+    writeFileSync(TOKEN_FILE, t, { mode: 0o600 })
+  } catch {}
+  return t
+}
+
+function tailscaleIp() {
+  try {
+    const out = execSync('tailscale ip -4', { encoding: 'utf8', timeout: 3000 }).trim()
+    const ip = out.split('\n')[0]?.trim()
+    if (ip) return ip
+  } catch {}
+  // Fallback: scan for the 100.64.0.0/10 CGNAT range Tailscale uses.
+  for (const list of Object.values(networkInterfaces())) {
+    for (const ni of list || []) {
+      if (ni.family === 'IPv4' && !ni.internal) {
+        const [a, b] = ni.address.split('.').map(Number)
+        if (a === 100 && b >= 64 && b <= 127) return ni.address
+      }
+    }
+  }
+  return null
 }
 
 const args = parseArgs(process.argv.slice(2))
@@ -53,18 +101,54 @@ if (!existsSync(entry)) {
   process.exit(1)
 }
 
-const env = {
-  ...process.env,
-  HOST: '127.0.0.1',
-  PORT: String(args.port),
-  NITRO_HOST: '127.0.0.1',
-  NITRO_PORT: String(args.port),
+let host = '127.0.0.1'
+let displayHost = 'localhost'
+let remote = false
+
+if (args.bind === 'tailnet') {
+  const ip = tailscaleIp()
+  if (!ip) {
+    console.error('✖ Could not find a Tailscale IP.')
+    console.error('  Install Tailscale and run `tailscale up` first: https://tailscale.com/download')
+    process.exit(1)
+  }
+  host = ip; displayHost = ip; remote = true
+} else if (args.bind === 'public') {
+  host = '0.0.0.0'; displayHost = '0.0.0.0'; remote = true
+} else if (args.bind !== 'localhost') {
+  console.error(`✖ Unknown --bind value: ${args.bind} (expected localhost | tailnet | public)`)
+  process.exit(1)
 }
 
+const token = remote ? loadOrCreateToken(args.token) : (args.token || '')
+
+const env = {
+  ...process.env,
+  HOST: host,
+  PORT: String(args.port),
+  NITRO_HOST: host,
+  NITRO_PORT: String(args.port),
+  CC_APP_MODE: 'app',          // installed app → "/" goes to the dashboard, not the landing page
+  CC_BIND: args.bind,
+  CC_AUTH_TOKEN: token,
+  CC_ALLOW_REMOTE_RUN: args.allowRemoteRun ? '1' : '0',
+}
+
+const localUrl = `http://localhost:${args.port}`
 console.log('')
 console.log('  claudecontrolai')
 console.log('  ──────────────────────────────────────────')
-console.log(`  dashboard:  http://localhost:${args.port}`)
+console.log(`  local:       ${localUrl}`)
+if (remote) {
+  console.log(`  remote:      http://${displayHost}:${args.port}   (open this on your phone)`)
+  console.log(`  token:       ${token}`)
+  console.log(`  remote run:  ${args.allowRemoteRun ? 'ENABLED ⚠️  (can execute code remotely)' : 'view-only'}`)
+  if (args.bind === 'public') {
+    console.log('  ⚠️  public bind exposes this host on your network — use a firewall/tunnel.')
+  }
+} else {
+  console.log('  tip:         --bind tailnet to reach it from your phone')
+}
 console.log('  ──────────────────────────────────────────')
 console.log('')
 
