@@ -3,7 +3,7 @@ import type { TaskStatus } from '~/server/utils/tasks'
 
 // ── Live Claude Todos ──────────────────────────────────────
 const MANUAL_SESSION_ID = 'cccc0000-cccc-cccc-cccc-000000000001'
-const { data: todosData, refresh: refreshTodos } = await useFetch('/api/todos')
+const { data: todosData, refresh: refreshTodos } = useLazyFetch('/api/todos', { server: false })
 
 async function cycleManualTodo(id: string, current: string) {
   const next = current === 'pending' ? 'in_progress' : current === 'in_progress' ? 'completed' : 'pending'
@@ -17,7 +17,7 @@ async function deleteManualTodo(id: string) {
 }
 
 // ── Personal Task Board ────────────────────────────────────
-const { data: tasksData, refresh: refreshTasks } = await useFetch('/api/tasks')
+const { data: tasksData, refresh: refreshTasks } = useLazyFetch('/api/tasks', { server: false })
 
 const showAddModal = ref(false)
 const modalTitle = ref('')

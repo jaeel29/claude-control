@@ -26,7 +26,7 @@ interface UsageSummary {
 	byProject: ProjectUsage[];
 }
 
-const { data, refresh } = await useFetch<UsageSummary>('/api/usage');
+const { data, refresh } = useLazyFetch<UsageSummary>('/api/usage', { server: false });
 
 onMounted(() => {
 	const t = setInterval(refresh, 30_000);

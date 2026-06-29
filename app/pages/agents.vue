@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data } = await useFetch('/api/agents')
+const { data } = useLazyFetch('/api/agents', { server: false })
 
 function toolList(tools: string) {
   return tools?.split(',').map(t => t.trim()).filter(Boolean) ?? []

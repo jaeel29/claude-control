@@ -19,7 +19,19 @@ export interface SessionGroup {
 }
 
 defineProps<{ group: SessionGroup }>();
-defineEmits<{ (e: 'click'): void }>();
+defineEmits<{ (e: 'click'): void; (e: 'stop', sessionId: string): void }>();
+
+const stopping = ref(false);
+
+async function stopSession(e: MouseEvent, sessionId: string, emit: (e: 'stop', sessionId: string) => void) {
+	e.stopPropagation();
+	stopping.value = true;
+	try {
+		await $fetch(`/api/session/${sessionId}/kill`, { method: 'POST' });
+		emit('stop', sessionId);
+	} catch { /* ignore */ }
+	finally { stopping.value = false; }
+}
 
 function relativeTime(ts: string) {
 	const diff = Date.now() - new Date(ts).getTime();
@@ -60,7 +72,12 @@ function formatText(text: string) {
 		</div>
 
 		<div class="row-badge">
-			<UiBadge v-if="group.isRunning" color="orange" dot :pulse="true">running</UiBadge>
+			<template v-if="group.isRunning">
+				<UiBadge color="orange" dot :pulse="true">running</UiBadge>
+				<button class="stop-btn" :disabled="stopping" :title="stopping ? 'Stopping…' : 'Stop session'" @click="stopSession($event, group.sessionId, $emit)">
+					<Icon :name="stopping ? 'lucide:loader-circle' : 'lucide:square'" size="13" :class="{ spin: stopping }" />
+				</button>
+			</template>
 			<UiBadge v-else color="green">done</UiBadge>
 		</div>
 		<div class="row-right">
@@ -88,7 +105,31 @@ function formatText(text: string) {
 }
 .row-badge {
 	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-left: 12px;
 }
+.stop-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	border: 1px solid rgba(229, 62, 62, 0.25);
+	background: rgba(229, 62, 62, 0.07);
+	color: #e53e3e;
+	cursor: pointer;
+	transition: background 0.15s, border-color 0.15s;
+}
+.stop-btn:hover:not(:disabled) {
+	background: rgba(229, 62, 62, 0.15);
+	border-color: rgba(229, 62, 62, 0.5);
+}
+.stop-btn:disabled { opacity: 0.5; cursor: default; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
 .row-content {
 	flex: 1;
 	min-width: 0;

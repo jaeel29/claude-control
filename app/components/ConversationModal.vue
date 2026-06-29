@@ -153,30 +153,19 @@ function msgTime(ts: string) {
 	<UiDrawer
 		:model-value="modelValue"
 		position="right"
-		:title="item?.project || 'Conversation'"
+		:title="item ? (item.project || 'Conversation') : 'Conversation'"
 		@update:model-value="$emit('update:modelValue', $event)"
 		:draggable="false"
 	>
 		<div v-if="item" class="drawer-inner">
 
-			<!-- Session meta -->
-			<div class="meta-section">
-				<!-- <div class="meta-row">
-					<span class="meta-label">Project</span>
-					<code class="meta-code">{{ item.project }}</code>
-				</div> -->
-				<div class="meta-row">
-					<span class="meta-label">Started</span>
-					<span class="meta-value">{{ fullDate(item.timestamp) }}</span>
-				</div>
-				<div class="meta-row">
-					<span class="meta-label">Session ID</span>
-					<code class="meta-code meta-code--sm">{{ item.sessionId || '—' }}</code>
-				</div>
-				<div class="meta-row">
-					<span class="meta-label">Messages</span>
-					<span class="meta-value">{{ item.messages.length }}</span>
-				</div>
+			<!-- Compact meta strip -->
+			<div class="meta-strip">
+				<span class="meta-strip-item">{{ item.sessionId ? '…' + item.sessionId.slice(-6) : '' }}</span>
+				<span class="meta-strip-sep">·</span>
+				<span class="meta-strip-item">{{ fullDate(item.timestamp) }}</span>
+				<span class="meta-strip-sep">·</span>
+				<span class="meta-strip-item">{{ item.messages.length }} messages</span>
 			</div>
 
 			<!-- Chat thread -->
@@ -295,30 +284,17 @@ function msgTime(ts: string) {
 	overflow: hidden;
 }
 
-/* ── Meta ── */
-.meta-section {
+/* ── Meta strip ── */
+.meta-strip {
 	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	padding: 14px 20px;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 20px;
 	border-bottom: 1px solid var(--border);
 	flex-shrink: 0;
 }
-.meta-row {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	padding: 5px 0;
-}
-.meta-label { font-size: 12px; color: var(--text-secondary); flex-shrink: 0; }
-.meta-value { font-size: 12px; color: var(--text-primary); }
-.meta-code {
-	font-size: 12px; color: var(--text-primary);
-	overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-	max-width: 260px; display: block; text-align: right;
-}
-.meta-code--sm { font-size: 10px; color: var(--text-muted); }
+.meta-strip-item { font-size: 11px; color: var(--text-muted); }
+.meta-strip-sep { font-size: 11px; color: var(--text-muted); opacity: 0.4; }
 
 /* ── Chat ── */
 .chat {

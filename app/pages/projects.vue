@@ -8,7 +8,7 @@ interface ProjectInfo {
   hasLocalAgents: boolean
 }
 
-const { data, refresh } = await useFetch<{ projects: ProjectInfo[] }>('/api/projects')
+const { data, refresh } = useLazyFetch<{ projects: ProjectInfo[] }>('/api/projects', { server: false })
 
 onMounted(() => {
   const t = setInterval(refresh, 10_000)

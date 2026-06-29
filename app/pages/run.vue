@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // ── Projects ───────────────────────────────────────────────
-const { data: projectsData } = await useFetch('/api/projects');
+const { data: projectsData } = useLazyFetch('/api/projects', { server: false });
 const availableProjects = computed(() => (projectsData.value?.projects ?? []).filter((p) => p.path));
 
 const projectOptions = computed(() => availableProjects.value.map((p) => ({ value: p.path!, label: p.name })));
@@ -48,7 +48,7 @@ interface Job {
 const jobs = ref<Job[]>([]);
 
 // ── History ───────────────────────────────────────────────
-const { data: historyData, refresh: refreshHistory } = await useFetch('/api/run/history');
+const { data: historyData, refresh: refreshHistory } = useLazyFetch('/api/run/history', { server: false });
 const pastRuns = computed(() => {
 	const ids = new Set(jobs.value.map((j) => j.id));
 	return (historyData.value?.history ?? []).filter((h) => !ids.has(h.id));

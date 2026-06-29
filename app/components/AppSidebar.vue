@@ -1,7 +1,15 @@
 <script setup lang="ts">
 const route = useRoute()
-const { data: stats } = await useFetch('/api/stats')
-const { data: projectsData } = await useFetch('/api/projects')
+// Lazy + client-only so the sidebar never blocks page navigation.
+const { data: stats } = useLazyFetch('/api/stats', { server: false })
+const { data: projectsData } = useLazyFetch('/api/projects', { server: false })
+
+const { selectedTheme, setTheme } = useTheme()
+const themeOptions = [
+  { value: 'light', icon: 'icons:theme-light', label: 'Light' },
+  { value: 'dark', icon: 'icons:theme-dark', label: 'Dark' },
+  { value: 'system', icon: 'icons:theme-system', label: 'System' },
+] as const
 
 const search = ref('')
 
@@ -10,14 +18,14 @@ const projects = computed(() =>
 )
 
 const nav = [
-  { label: 'Overview',  href: '/',         icon: 'lucide:layout-dashboard' },
+  { label: 'Overview',  href: '/overview', icon: 'lucide:layout-dashboard' },
   { label: 'Activity',  href: '/activity',  icon: 'lucide:activity' },
   { label: 'Agents',    href: '/agents',    icon: 'lucide:bot' },
   // { label: 'Tasks',     href: '/tasks',     icon: 'lucide:check-square' },
   { label: 'Logs',      href: '/logs',      icon: 'lucide:scroll-text' },
-  { label: 'Run',       href: '/run',       icon: 'lucide:send' },
+  // { label: 'Run',       href: '/run',       icon: 'lucide:send' },
   { label: 'Usage',     href: '/usage',     icon: 'lucide:bar-chart-2' },
-  { label: 'Test',      href: '/test',      icon: 'lucide:flask-conical' },
+  // { label: 'Test',      href: '/test',      icon: 'lucide:flask-conical' },
 ]
 
 const PROJECT_COLORS = [
@@ -37,8 +45,8 @@ function projectInitial(name: string) {
 <template>
   <aside class="sidebar">
 
-    <!-- ── Workspace ── -->
-    <div class="workspace">
+    <!-- ── Workspace (click → landing page) ── -->
+    <NuxtLink to="/" class="workspace" title="Back to home">
       <div class="workspace-avatar">
         <Icon name="icons:logo" :size="24" mode="svg" />
       </div>
@@ -46,7 +54,7 @@ function projectInitial(name: string) {
         <div class="workspace-name">Claude Control</div>
         <div class="workspace-sub">Agent Dashboard</div>
       </div>
-    </div>
+    </NuxtLink>
 
     <!-- ── Search ── -->
     <!-- <div class="search-wrap">
@@ -57,6 +65,7 @@ function projectInitial(name: string) {
     <!-- ── Overview nav ── -->
     <!-- <div class="section-label">Overview</div> -->
 
+    <div class="nav-items">
     <NuxtLink
       v-for="item in nav"
       v-show="!search || item.label.toLowerCase().includes(search.toLowerCase())"
@@ -68,8 +77,9 @@ function projectInitial(name: string) {
       <span class="nav-icon-wrap">
         <Icon :name="item.icon" size="16" />
       </span>
-      {{ item.label }}
-    </NuxtLink>
+        {{ item.label }}
+      </NuxtLink>
+    </div>
 
     <!-- ── Projects ── -->
     <template v-if="projects.length">
@@ -95,15 +105,29 @@ function projectInitial(name: string) {
       </NuxtLink> -->
     </template>
 
-    <!-- ── Footer ── -->
-    <!-- <div class="sidebar-footer">
-      <div class="status-row">
-        <span class="status-dot" :class="{ active: (stats?.running ?? 0) > 0 }"></span>
-        <span class="status-text">
-          {{ stats?.running ?? 0 }} session{{ stats?.running !== 1 ? 's' : '' }} running
-        </span>
-      </div>
-    </div> -->
+    <!-- ── Footer: theme toggle ── -->
+    <div class="sidebar-footer">
+      <!-- ClientOnly: selectedTheme differs between SSR ('system' default) and the
+           client (saved value), so SSR marks the wrong tab active and flashes two
+           highlights. Render client-side only (same as Diali's footer). -->
+      <ClientOnly>
+        <div class="theme-toggle" role="group" aria-label="Theme">
+          <button
+            v-for="opt in themeOptions"
+            :key="opt.value"
+            class="theme-toggle__btn"
+            :class="{ active: selectedTheme === opt.value }"
+            type="button"
+            :title="opt.label"
+            :aria-label="opt.label"
+            :aria-pressed="selectedTheme === opt.value"
+            @click="setTheme(opt.value)"
+          >
+            <Icon :name="opt.icon" size="15" mode="svg" />
+          </button>
+        </div>
+      </ClientOnly>
+    </div>
 
   </aside>
 </template>
@@ -127,14 +151,22 @@ function projectInitial(name: string) {
   gap: 10px;
   /* padding: 4px 8px; */
   margin-bottom: 24px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 8px;
+  transition: opacity 0.12s;
   /* border-bottom: 1px solid var(--sidebar-divider); */
+
+  &:hover {
+    opacity: 0.75;
+  }
 }
 
 .workspace-avatar {
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--sidebar-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -221,12 +253,19 @@ function projectInitial(name: string) {
 }
 
 /* ── Nav items ── */
+.nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .nav-item {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
-  border-radius: 10px;
+  height: 32px;
+  border-radius: 8px;
   color: var(--sidebar-text);
   text-decoration: none;
   font-size: 13px;
@@ -237,12 +276,14 @@ function projectInitial(name: string) {
   user-select: none;
 }
 .nav-item:hover {
-  background: #f5f5f5;
-  color: #111827;
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
 }
+
 .nav-item.active {
-  background: #111827;
-  color: #ffffff;
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+  color: var(--text-primary);
+  box-shadow: var(--glass-card-shadow);
+  
 }
 
 .nav-icon-wrap {
@@ -296,8 +337,42 @@ function projectInitial(name: string) {
 /* ── Footer ── */
 .sidebar-footer {
   margin-top: auto;
-  padding-top: 10px;
-  border-top: 1px solid var(--sidebar-divider);
+  padding-top: 12px;
+  /* border-top: 1px solid var(--sidebar-divider); */
+}
+
+/* ── Theme toggle (segmented light / dark / system) ── */
+.theme-toggle {
+  display: flex;
+  gap: 6px;
+  /* padding: 3px; */
+  /* border-radius: var(--radius-sm); */
+  /* background: var(--bg-surface); */
+  /* border: 1px solid var(--border); */
+}
+
+
+.theme-toggle__btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--sidebar-border);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.theme-toggle__btn:hover {
+  color: var(--text-primary);
+}
+.theme-toggle__btn.active {
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+  color: var(--text-primary);
+  /* box-shadow: var(--shadow-sm); */
 }
 
 .status-row {

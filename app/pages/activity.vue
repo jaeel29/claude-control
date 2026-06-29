@@ -33,7 +33,7 @@ interface SessionGroup {
 	allMessages: ConversationMessage[];
 }
 
-const { data, refresh } = await useFetch<{ items: ActivityItem[] }>('/api/activity');
+const { data, refresh } = useLazyFetch<{ items: ActivityItem[] }>('/api/activity', { server: false });
 
 onMounted(() => {
 	const t = setInterval(refresh, 10_000);
@@ -73,29 +73,13 @@ const sessions = computed<SessionGroup[]>(() => {
 	});
 });
 
-const selectedId = ref<string | null>(null);
-const showModal = ref(false);
+const { selectChat } = useSelectedChat();
+const { show } = useChatWidget();
 
-// Always derived from live sessions — updates automatically on each refresh
-const selectedAsItem = computed(() => {
-	if (!selectedId.value) return null;
-	const g = sessions.value.find(s => s.sessionId === selectedId.value);
-	if (!g) return null;
-	return {
-		text: g.firstPrompt,
-		fullText: g.firstPrompt,
-		timestamp: g.lastTimestamp,
-		project: g.project,
-		cwd: g.cwd,
-		sessionId: g.sessionId,
-		aiTitle: g.aiTitle,
-		messages: [...g.allMessages].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()),
-	};
-});
-
+// Render the clicked chat in the persistent ChatWidget (opening it if hidden).
 function open(group: SessionGroup) {
-	selectedId.value = group.sessionId;
-	showModal.value = true;
+	selectChat(group.sessionId);
+	show();
 }
 
 </script>
@@ -121,10 +105,8 @@ function open(group: SessionGroup) {
 		</div>
 
 		<div class="activity-list">
-			<ActivitySessionRow v-for="group in sessions" :key="group.sessionId" :group="group" @click="open(group)" />
+			<ActivitySessionRow v-for="group in sessions" :key="group.sessionId" :group="group" @click="open(group)" @stop="() => refresh()" />
 		</div>
-
-		<ConversationModal v-model="showModal" :item="selectedAsItem" />
 	</div>
 </template>
 

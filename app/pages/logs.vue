@@ -1,5 +1,11 @@
 <script setup lang="ts">
-const { data: logData, refresh: refreshLog } = await useFetch('/api/sessionlog');
+// Lazy + client-only so navigation is never blocked by this fetch.
+const { data: logData, pending, error, refresh: refreshLog } = useApi().data<{ sessions: any[] }>(
+	'sessionlog',
+	'/sessionlog',
+	{ server: false, lazy: true, default: () => ({ sessions: [] }) },
+);
+const hasData = computed(() => !!logData.value?.sessions);
 
 const expandedSession = ref<string | null>(null);
 function toggleSession(id: string) {
@@ -41,14 +47,16 @@ function topTools(toolCalls: Record<string, number>) {
 			</div>
 		</div>
 
-		<div v-if="!logData?.sessions.length" class="card">
-			<div class="empty">
-				<Icon name="lucide:terminal" size="32" style="opacity: 0.25; display: block; margin: 0 auto 12px" />
-				No session logs found
-			</div>
-		</div>
-
-		<div v-else class="log-list">
+		<UiPageState
+			:pending="pending"
+			:has-data="hasData"
+			:error="error"
+			:empty="!logData?.sessions.length"
+			empty-text="No session logs found"
+			empty-icon="lucide:terminal"
+			:on-retry="refreshLog"
+		>
+		<div class="log-list">
 			<div
 				v-for="session in logData.sessions"
 				:key="session.sessionId"
@@ -128,6 +136,7 @@ function topTools(toolCalls: Record<string, number>) {
 				</div>
 			</div>
 		</div>
+		</UiPageState>
 	</div>
 </template>
 
