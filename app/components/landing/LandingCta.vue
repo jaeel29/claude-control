@@ -49,9 +49,18 @@ import BaseButton from '~/components/ui/BaseButton.vue';
 	}
 }
 
-@media (max-width: 760px) {
+@include respond-to('md') {
 	.cta h2 {
 		font-size: 28px;
+	}
+}
+
+@include respond-to('xs') {
+	.cta h2 {
+		font-size: 24px;
+	}
+	.cta :deep(.btn) {
+		width: 100%;
 	}
 }
 </style>

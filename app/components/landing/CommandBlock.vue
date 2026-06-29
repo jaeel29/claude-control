@@ -108,4 +108,19 @@ async function copy() {
 		}
 	}
 }
+
+@include respond-to('xs') {
+	.cmd__body {
+		gap: 10px;
+		padding: 14px 14px;
+
+		code {
+			font-size: 13px;
+		}
+	}
+	.cmd__copy {
+		padding: 6px 10px;
+		font-size: 12px;
+	}
+}
 </style>

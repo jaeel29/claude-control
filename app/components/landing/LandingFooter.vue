@@ -67,4 +67,13 @@ const { repoUrl } = useSite();
 		}
 	}
 }
+
+@include respond-to('xs') {
+	.footer {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 24px;
+		padding: 32px 16px;
+	}
+}
 </style>

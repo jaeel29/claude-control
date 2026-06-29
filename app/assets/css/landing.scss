@@ -2,13 +2,21 @@
 // section wrapper, headline sizing, glass-card treatment, and badge centering
 // stay consistent without duplicating values.
 
+// Breakpoint mixins are auto-injected into component <style> blocks, but a mixin
+// defined HERE resolves respond-to() in this file's scope, so import it directly.
+@use '~/assets/css/_breakpoints.scss' as *;
+
 @mixin section {
 	max-width: 960px;
 	margin: 0 auto;
 	padding: 96px 24px;
 
-	@media (max-width: 760px) {
+	@include respond-to('md') {
 		padding: 64px 20px;
+	}
+
+	@include respond-to('xs') {
+		padding: 56px 16px;
 	}
 }
 

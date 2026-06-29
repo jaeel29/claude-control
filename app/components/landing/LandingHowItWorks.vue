@@ -104,12 +104,22 @@ const steps = [
 	}
 }
 
-@media (max-width: 760px) {
+@include respond-to('md') {
 	.how h2 {
 		font-size: 28px;
 	}
 	.how__steps {
 		grid-template-columns: 1fr;
+		margin-top: 36px;
+	}
+}
+
+@include respond-to('xs') {
+	.how h2 {
+		font-size: 24px;
+	}
+	.step {
+		padding: 22px;
 	}
 }
 </style>

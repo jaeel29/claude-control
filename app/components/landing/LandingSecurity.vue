@@ -77,12 +77,19 @@ const items = [
 	}
 }
 
-@media (max-width: 760px) {
+@include respond-to('md') {
 	.security h2 {
 		font-size: 28px;
 	}
 	.security__grid {
 		grid-template-columns: 1fr;
+		margin-top: 32px;
+	}
+}
+
+@include respond-to('xs') {
+	.security h2 {
+		font-size: 24px;
 	}
 }
 </style>

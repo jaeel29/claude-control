@@ -344,10 +344,19 @@ function statusIcon(status: string) {
   </Teleport>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 /* ── Page header ── */
 .page-header { margin-bottom: 28px; }
-.page-title { font-size: 22px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; }
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+
+  @include respond-to('sm') {
+    font-size: 19px;
+  }
+}
 .page-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 3px; }
 
 /* ── Section ── */
@@ -357,6 +366,8 @@ function statusIcon(status: string) {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 .section-title {
   font-size: 13px;
@@ -679,6 +690,10 @@ function statusIcon(status: string) {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
+
+  @include respond-to('md') {
+    grid-template-columns: 1fr;
+  }
 }
 .kanban-col {
   background: var(--bg-surface);
@@ -774,10 +789,15 @@ function statusIcon(status: string) {
   cursor: pointer;
   gap: 12px;
   transition: background 0.12s;
+
+  @include respond-to('xs') {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }
 .log-header:hover { background: var(--bg-surface); }
-.log-header-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.log-project { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.log-header-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
+.log-project { font-size: 13px; font-weight: 600; color: var(--text-primary); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .log-session-id {
   font-size: 10px;
   font-family: 'SF Mono', 'Fira Code', monospace;
@@ -787,8 +807,8 @@ function statusIcon(status: string) {
   border-radius: 4px;
   padding: 1px 6px;
 }
-.log-header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.log-chips { display: flex; gap: 5px; }
+.log-header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
+.log-chips { display: flex; gap: 5px; flex-wrap: wrap; }
 .log-chip {
   display: inline-flex;
   align-items: center;

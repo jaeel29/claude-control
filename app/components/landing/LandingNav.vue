@@ -8,7 +8,7 @@
 
 		<div class="nav__brand">
 			<Icon name="icons:logo" size="22" mode="svg" />
-			<span>claude-control</span>
+			<span>Claude Control</span>
 		</div>
 
 		<div class="nav__actions">
@@ -119,10 +119,34 @@ const themeIcon = computed(() => {
 	}
 }
 
-@media (max-width: 760px) {
+@include respond-to('md') {
 	/* Hide center links on mobile; keep brand + actions */
 	.nav__links {
 		display: none;
+	}
+
+	/* With links gone, push brand to the natural left so it isn't overlapped
+	   by the actions on the right at narrow widths. */
+	.nav__brand {
+		position: static;
+		transform: none;
+	}
+
+	.nav {
+		justify-content: space-between;
+	}
+}
+
+@include respond-to('xxs') {
+	.nav {
+		padding: 16px 16px;
+	}
+	.nav__brand {
+		font-size: 14px;
+		gap: 7px;
+	}
+	.nav__actions {
+		gap: 10px;
 	}
 }
 </style>

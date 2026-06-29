@@ -159,9 +159,25 @@ function toggle(i: number) {
 	}
 }
 
-@media (max-width: 760px) {
+@include respond-to('md') {
 	.faq h2 {
 		font-size: 28px;
+	}
+}
+
+@include respond-to('xs') {
+	.faq h2 {
+		font-size: 24px;
+	}
+	.faq__trigger {
+		padding: 16px 16px;
+		gap: 12px;
+	}
+	.faq__question {
+		font-size: 15px;
+	}
+	.faq__answer {
+		padding: 14px 16px;
 	}
 }
 </style>

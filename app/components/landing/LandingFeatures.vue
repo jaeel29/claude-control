@@ -112,9 +112,18 @@ const features: { label: string; color: BadgeColor; icon: string; title: string;
 	}
 }
 
-@media (max-width: 760px) {
+@include respond-to('md') {
 	.features {
 		grid-template-columns: 1fr;
+	}
+}
+
+@include respond-to('xs') {
+	.feature {
+		padding: 22px;
+	}
+	.feature h3 {
+		font-size: 19px;
 	}
 }
 </style>

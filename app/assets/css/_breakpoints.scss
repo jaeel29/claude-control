@@ -1,0 +1,56 @@
+// ============================================================================
+// Breakpoints — the single source of truth for responsive cutoffs.
+// (Ported from the Diali.ai design system.)
+//
+// CSS custom properties can't be used inside @media conditions, so breakpoints
+// live here in Sass and are inlined at build time. This partial is auto-injected
+// into every component's <style lang="scss"> via nuxt.config's additionalData —
+// so you NEVER import it; just call the mixins.
+//
+// JS twin: `app/utils/breakpoints.ts` mirrors this map for state-driven layout
+// (matchMedia, via useBreakpoint). Change a value here → change it there too.
+//
+//   @include respond-to('md')   { ... }   // max-width: 768px  (mobile-first "down to")
+//   @include respond-from('lg') { ... }   // min-width: 961px  (desktop-first "from")
+//   @include respond-between('sm','lg') { ... }   // 641px–960px
+// ============================================================================
+
+@use 'sass:map';
+
+$breakpoints: (
+	xxs: 375px,
+	xs: 480px,
+	sm: 640px,
+	md: 768px,
+	lg: 960px,
+	xl: 1200px,
+);
+
+@function bp($name) {
+	@if not map.has-key($breakpoints, $name) {
+		@error "Unknown breakpoint `#{$name}`. Use one of: #{map.keys($breakpoints)}.";
+	}
+	@return map.get($breakpoints, $name);
+}
+
+// Styles apply at the breakpoint width and BELOW (the common mobile case).
+@mixin respond-to($name) {
+	@media (max-width: bp($name)) {
+		@content;
+	}
+}
+
+// Styles apply ABOVE the breakpoint (min-width is bp + 1px so the two never
+// overlap on the exact boundary pixel).
+@mixin respond-from($name) {
+	@media (min-width: bp($name) + 1px) {
+		@content;
+	}
+}
+
+// Styles apply only within a range — inclusive of `$from`+1, up to `$to`.
+@mixin respond-between($from, $to) {
+	@media (min-width: bp($from) + 1px) and (max-width: bp($to)) {
+		@content;
+	}
+}

@@ -87,7 +87,7 @@ function toolList(tools: string) {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 /* ── Page header ── */
 .page-header { margin-bottom: 28px; }
 .page-title {
@@ -95,6 +95,10 @@ function toolList(tools: string) {
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
+
+  @include respond-to('sm') {
+    font-size: 19px;
+  }
 }
 .page-subtitle {
   font-size: 13px;
@@ -154,6 +158,10 @@ function toolList(tools: string) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 12px;
+
+  @include respond-to('xs') {
+    grid-template-columns: 1fr;
+  }
 }
 .agent-card {
   background: var(--bg-card);

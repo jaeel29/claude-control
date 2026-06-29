@@ -140,7 +140,7 @@ function topTools(toolCalls: Record<string, number>) {
 	</div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 /* ── Page header ── */
 .page-header {
 	display: flex;
@@ -148,12 +148,21 @@ function topTools(toolCalls: Record<string, number>) {
 	justify-content: space-between;
 	margin-bottom: 24px;
 	gap: 16px;
+
+	@include respond-to('sm') {
+		flex-direction: column;
+		gap: 10px;
+	}
 }
 .page-title {
 	font-size: 22px;
 	font-weight: 700;
 	color: var(--text-primary);
 	letter-spacing: -0.02em;
+
+	@include respond-to('sm') {
+		font-size: 19px;
+	}
 }
 .page-subtitle {
 	font-size: 13px;
@@ -166,6 +175,11 @@ function topTools(toolCalls: Record<string, number>) {
 	gap: 10px;
 	flex-shrink: 0;
 	padding-top: 4px;
+	flex-wrap: wrap;
+
+	@include respond-to('sm') {
+		padding-top: 0;
+	}
 }
 .total-badge {
 	font-size: 11px;
@@ -224,6 +238,11 @@ function topTools(toolCalls: Record<string, number>) {
 	cursor: pointer;
 	gap: 12px;
 	transition: background 0.12s;
+
+	@include respond-to('xs') {
+		flex-wrap: wrap;
+		gap: 8px;
+	}
 }
 .log-header:hover {
 	/* background: var(--bg-surface); */
@@ -233,11 +252,15 @@ function topTools(toolCalls: Record<string, number>) {
 	align-items: center;
 	gap: 8px;
 	min-width: 0;
+	flex-wrap: wrap;
 }
 .log-project {
 	font-size: 13px;
 	font-weight: 600;
 	color: var(--text-primary);
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .log-session-id {
 	font-size: 10px;
@@ -253,10 +276,16 @@ function topTools(toolCalls: Record<string, number>) {
 	align-items: center;
 	gap: 10px;
 	flex-shrink: 0;
+
+	@include respond-to('xs') {
+		flex-wrap: wrap;
+		flex-shrink: 1;
+	}
 }
 .log-chips {
 	display: flex;
 	gap: 5px;
+	flex-wrap: wrap;
 }
 .log-time {
 	font-size: 11px;

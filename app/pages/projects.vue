@@ -90,7 +90,7 @@ function relativeTime(ts: string | null) {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 /* ── Page header ── */
 .page-header { margin-bottom: 28px; }
 .page-title {
@@ -98,6 +98,10 @@ function relativeTime(ts: string | null) {
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
+
+  @include respond-to('sm') {
+    font-size: 19px;
+  }
 }
 .page-subtitle {
   font-size: 13px;
@@ -172,6 +176,10 @@ function relativeTime(ts: string | null) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 12px;
+
+  @include respond-to('sm') {
+    grid-template-columns: 1fr;
+  }
 }
 .project-card {
   background: var(--bg-card);

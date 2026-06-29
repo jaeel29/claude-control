@@ -89,4 +89,14 @@ const current = computed(() => options[active.value]);
 		line-height: 1.5;
 	}
 }
+
+@include respond-to('xs') {
+	.install__tab {
+		padding: 7px 12px;
+		font-size: 12px;
+	}
+	.install__hint {
+		font-size: 12px;
+	}
+}
 </style>

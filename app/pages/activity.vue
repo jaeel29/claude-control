@@ -110,7 +110,7 @@ function open(group: SessionGroup) {
 	</div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 /* ── Page header ── */
 .page-header {
 	display: flex;
@@ -118,12 +118,21 @@ function open(group: SessionGroup) {
 	justify-content: space-between;
 	margin-bottom: 28px;
 	gap: 16px;
+
+	@include respond-to('sm') {
+		flex-direction: column;
+		gap: 10px;
+	}
 }
 .page-title {
 	font-size: 22px;
 	font-weight: 700;
 	color: var(--text-primary);
 	letter-spacing: -0.02em;
+
+	@include respond-to('sm') {
+		font-size: 19px;
+	}
 }
 .page-subtitle {
 	font-size: 13px;
@@ -136,6 +145,11 @@ function open(group: SessionGroup) {
 	gap: 8px;
 	flex-shrink: 0;
 	padding-top: 4px;
+	flex-wrap: wrap;
+
+	@include respond-to('sm') {
+		padding-top: 0;
+	}
 }
 .total-badge {
 	font-size: 11px;

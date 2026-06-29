@@ -500,19 +500,29 @@ onUnmounted(() => {
 	</div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 /* ── Page ── */
 .page-header {
 	display: flex;
 	align-items: flex-start;
 	justify-content: space-between;
 	margin-bottom: 28px;
+	gap: 16px;
+
+	@include respond-to('sm') {
+		flex-direction: column;
+		gap: 12px;
+	}
 }
 .page-title {
 	font-size: 22px;
 	font-weight: 700;
 	color: var(--text-primary);
 	letter-spacing: -0.02em;
+
+	@include respond-to('sm') {
+		font-size: 19px;
+	}
 }
 .page-subtitle {
 	font-size: 13px;
@@ -523,6 +533,7 @@ onUnmounted(() => {
 	display: flex;
 	align-items: center;
 	gap: 10px;
+	flex-wrap: wrap;
 }
 /* ── Task list ── */
 .task-list {
@@ -563,9 +574,17 @@ onUnmounted(() => {
 	border-radius: 10px;
 	flex-shrink: 0;
 	white-space: nowrap;
+	max-width: 120px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
+	@include respond-to('xs') {
+		display: none;
+	}
 }
 .task-prompt {
 	flex: 1;
+	min-width: 0;
 	font-size: 12.5px;
 	color: var(--text-primary);
 	white-space: nowrap;

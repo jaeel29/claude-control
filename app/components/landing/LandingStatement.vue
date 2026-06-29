@@ -31,9 +31,18 @@
 	}
 }
 
-@media (max-width: 760px) {
+@include respond-to('md') {
 	.statement h2 {
 		font-size: 28px;
+	}
+}
+
+@include respond-to('xs') {
+	.statement h2 {
+		font-size: 24px;
+	}
+	.statement p {
+		font-size: 16px;
 	}
 }
 </style>

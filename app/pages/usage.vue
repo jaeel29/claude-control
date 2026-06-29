@@ -226,19 +226,29 @@ function tokenPct(key: 'input' | 'output') {
 </template>
 
 
-<style scoped>
+<style scoped lang="scss">
 /* ── Page header ── */
 .page-header {
 	display: flex;
 	align-items: flex-start;
 	justify-content: space-between;
 	margin-bottom: 28px;
+	gap: 16px;
+
+	@include respond-to('sm') {
+		flex-direction: column;
+		gap: 12px;
+	}
 }
 .page-title {
 	font-size: 22px;
 	font-weight: 700;
 	color: var(--text-primary);
 	letter-spacing: -0.02em;
+
+	@include respond-to('sm') {
+		font-size: 19px;
+	}
 }
 .page-subtitle {
 	font-size: 13px;
@@ -257,12 +267,20 @@ function tokenPct(key: 'input' | 'output') {
 	grid-template-columns: repeat(3, 1fr);
 	gap: 8px;
 	margin-bottom: 28px;
+
+	@include respond-to('xs') {
+		grid-template-columns: 1fr;
+	}
 }
 .stat-card {
 	background: var(--bg-card);
 	border: 1px solid var(--border);
 	border-radius: 16px;
 	padding: 24px;
+
+	@include respond-to('sm') {
+		padding: 18px;
+	}
 }
 .stat-value {
 	font-size: 24px;
@@ -367,6 +385,19 @@ function tokenPct(key: 'input' | 'output') {
 	grid-template-columns: 200px 1fr 80px;
 	align-items: center;
 	gap: 14px;
+
+	@include respond-to('md') {
+		grid-template-columns: 140px 1fr 70px;
+		gap: 10px;
+	}
+	@include respond-to('xs') {
+		grid-template-columns: 1fr auto;
+		gap: 6px 10px;
+
+		.proj-info {
+			grid-column: 1 / -1;
+		}
+	}
 }
 .proj-info {
 	display: flex;
@@ -421,6 +452,15 @@ function tokenPct(key: 'input' | 'output') {
 	grid-template-columns: 110px 1fr 70px;
 	align-items: center;
 	gap: 14px;
+
+	@include respond-to('xs') {
+		grid-template-columns: 1fr auto;
+		gap: 6px 10px;
+
+		.breakdown-label {
+			grid-column: 1 / -1;
+		}
+	}
 }
 .breakdown-label {
 	font-size: 12px;

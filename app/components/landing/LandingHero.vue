@@ -69,7 +69,7 @@ import BaseButton from '~/components/ui/BaseButton.vue';
 	}
 }
 
-@media (max-width: 760px) {
+@include respond-to('md') {
 	.hero h1 {
 		font-size: 36px;
 	}
@@ -83,6 +83,29 @@ import BaseButton from '~/components/ui/BaseButton.vue';
 		:deep(.btn) {
 			width: 100%;
 		}
+	}
+}
+
+@include respond-to('xs') {
+	.hero {
+		padding-top: 40px;
+	}
+	.hero h1 {
+		font-size: 30px;
+		margin-top: 18px;
+	}
+	.hero__sub {
+		font-size: 15px;
+		margin-top: 18px;
+	}
+	.hero__cmd {
+		margin-top: 28px;
+	}
+}
+
+@include respond-to('xxs') {
+	.hero h1 {
+		font-size: 27px;
 	}
 }
 </style>
