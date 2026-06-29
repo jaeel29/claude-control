@@ -1,7 +1,7 @@
 <template>
 	<section id="how" class="how">
 		<BaseBadge variant="glass" color="teal">How it works</BaseBadge>
-		<h2>Up and running in one command.</h2>
+		<h2>Up and running in seconds.</h2>
 		<div class="how__steps">
 			<div v-for="s in steps" :key="s.n" class="step">
 				<div class="step__n">{{ s.n }}</div>
@@ -10,9 +10,9 @@
 			</div>
 		</div>
 
-		<div class="how__phone">
-			<p class="how__phone-label">To open it on your phone, start it like this instead:</p>
-			<LandingCommandBlock command="npx claudecontrolai --bind lan" label="phone access" />
+		<div class="how__cmd">
+			<p class="how__cmd-label">That's the whole setup — one command:</p>
+			<LandingCommandBlock command="npx claudecontrolai" label="your terminal" />
 		</div>
 	</section>
 </template>
@@ -24,17 +24,17 @@ const steps = [
 	{
 		n: '1',
 		title: 'Run one command',
-		body: 'Paste npx claudecontrolai into your terminal. Nothing to install, no sign-up — it just starts.',
+		body: 'Paste npx claudecontrolai into your terminal. No install, no sign-up — it just starts.',
 	},
 	{
 		n: '2',
 		title: 'Open the dashboard',
-		body: 'It opens in your browser and immediately shows your Claude Code sessions, history, and costs.',
+		body: 'It opens in your browser, already showing your live sessions, history, and costs.',
 	},
 	{
 		n: '3',
-		title: 'Add your phone (optional)',
-		body: 'Want to check it on the go? Run it with --bind lan and open the same dashboard on your phone — same Wi-Fi, no extra setup.',
+		title: 'Everything stays local',
+		body: 'It reads the data Claude Code already saved on your machine. No cloud, no account — nothing leaves your computer.',
 	},
 ];
 </script>
@@ -61,7 +61,7 @@ const steps = [
 		text-align: left;
 	}
 
-	&__phone {
+	&__cmd {
 		margin: 44px auto 0;
 		max-width: 520px;
 

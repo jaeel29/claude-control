@@ -1,7 +1,7 @@
 <template>
 	<section class="security">
-		<BaseBadge variant="glass" color="yellow">Built for trust</BaseBadge>
-		<h2>Remote, without the risk.</h2>
+		<BaseBadge variant="glass" color="yellow">Local-first</BaseBadge>
+		<h2>Yours alone, by design.</h2>
 		<div class="security__grid">
 			<div v-for="item in items" :key="item.title" class="sec">
 				<Icon :name="item.icon" size="18" mode="svg" />
@@ -17,19 +17,19 @@ import BaseBadge from '~/components/ui/BaseBadge.vue';
 
 const items = [
 	{
-		icon: 'lucide:lock',
-		title: 'Token-protected',
-		body: 'Every remote request needs an access token, generated on first run.',
+		icon: 'lucide:hard-drive',
+		title: 'Runs on your machine',
+		body: 'A small local server reads the session files Claude Code already saved. There is no backend to phone home to.',
 	},
 	{
-		icon: 'lucide:shield',
-		title: 'Private network',
-		body: 'With Tailscale, the dashboard is only reachable on your own devices.',
+		icon: 'lucide:cloud-off',
+		title: 'No cloud, no account',
+		body: 'Nothing is uploaded and there is nothing to sign up for. Your conversations never leave your computer.',
 	},
 	{
-		icon: 'lucide:eye',
-		title: 'View-only by default',
-		body: 'Watching is free; running code remotely is opt-in with one flag.',
+		icon: 'lucide:github',
+		title: 'Open source',
+		body: 'Every line is on GitHub — read it, audit it, or run your own build.',
 	},
 ];
 </script>

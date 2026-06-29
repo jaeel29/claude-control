@@ -1,8 +1,8 @@
 <template>
 	<section class="cta">
 		<BaseBadge variant="glass" color="teal">Get started</BaseBadge>
-		<h2>One command. That's it.</h2>
-		<p class="cta__sub">Paste this into your terminal and your dashboard opens.</p>
+		<h2>Run it in one command.</h2>
+		<p class="cta__sub">No install, no account — paste it and your dashboard opens.</p>
 		<div class="cta__cmd">
 			<LandingCommandBlock command="npx claudecontrolai" label="your terminal" />
 		</div>

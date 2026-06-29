@@ -53,12 +53,12 @@ const faqs = [
 		a: 'Yes. You can start a new task, resume a past session, or stop a run — straight from the dashboard, no terminal needed.',
 	},
 	{
-		q: 'How do I open it on my phone?',
-		a: 'On the same Wi-Fi, run: npx claudecontrolai --bind lan — it prints a phone URL and an access token; open that URL on your phone and enter the token. To reach it from anywhere, use --bind tailnet (Tailscale). Your computer must stay awake; remote is view-only unless you add --allow-remote-run.',
+		q: 'Is it open source?',
+		a: 'Yes. The whole project is on GitHub — read it, audit it, or build it yourself. MIT licensed.',
 	},
 	{
 		q: 'What do I need to get started?',
-		a: 'Node 20 or newer and the Claude Code CLI you already use. That is everything — phone access on the same Wi-Fi needs no extra software.',
+		a: 'Node 20 or newer and the Claude Code CLI you already use. That is everything.',
 	},
 ];
 

@@ -37,7 +37,6 @@ const options: Record<TabKey, { command: string; cmdLabel: string; hint: string;
 		command: 'npx claudecontrolai',
 		cmdLabel: 'your terminal',
 		hint: 'Run it in your terminal — needs Node 20+. Opens at localhost:3001.',
-		note: 'Add --bind lan to open it on your phone (same Wi-Fi).',
 	},
 	claude: {
 		command: 'install and run claudecontrolai',

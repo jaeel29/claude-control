@@ -1,9 +1,9 @@
 <template>
 	<section class="statement">
-		<h2>Everything Claude Code does,<br />in one clear view.</h2>
+		<h2>The terminal scrolls away.<br />Your work shouldn't.</h2>
 		<p>
-			Claude Code already saves your sessions to your computer. claude-control reads them and turns
-			them into a live dashboard — so nothing is hidden in the terminal, and nothing leaves your machine.
+			Claude Code already records every session to your computer. claudecontrol turns that into a
+			dashboard you can actually read — searchable, always there, and never leaving your machine.
 		</p>
 	</section>
 </template>

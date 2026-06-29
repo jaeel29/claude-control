@@ -15,7 +15,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'blank' });
 useHead({
-	title: 'claude-control — see what Claude Code is doing, from anywhere',
+	title: 'claude-control — see everything Claude Code does',
 	meta: [
 		{
 			name: 'description',

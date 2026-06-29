@@ -1,13 +1,13 @@
 <template>
 	<section class="hero">
-		<BaseBadge variant="glass" color="teal">Runs on your computer · open source</BaseBadge>
+		<BaseBadge variant="glass" color="teal">Local-first · open source</BaseBadge>
 		<h1>
-			A dashboard for<br />
-			your Claude Code.
+			See everything<br />
+			Claude Code does.
 		</h1>
 		<p class="hero__sub">
-			See what Claude Code is doing on your computer — live sessions, past chats, and what each run
-			costs. Run one command — and check it from your phone whenever you are away.
+			A live dashboard for your Claude Code sessions — running tasks, full conversations, tool
+			history, and cost. Open source, self-hosted, one command.
 		</p>
 		<div class="hero__cmd">
 			<LandingInstall />
