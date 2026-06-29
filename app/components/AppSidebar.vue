@@ -162,6 +162,15 @@ function projectInitial(name: string) {
       transform: translateX(0);
     }
   }
+
+  /* On phones the drawer takes ~70vw, leaving a strip of backdrop to tap to
+     close. Flush to the left edge, so only the right corners round. */
+  @include respond-to('sm') {
+    width: 70vw;
+    max-width: 70vw;
+    border-left: none;
+    border-radius: 0 16px 16px 0;
+  }
 }
 
 /* ── Workspace ── */

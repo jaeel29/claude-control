@@ -555,18 +555,22 @@ onMounted(() => {
 		z-index: 50;
 		box-shadow: -8px 0 32px rgba(0, 0, 0, 0.18);
 	}
-	/* On tablets/phones (≤ md) the overlay takes the full screen. */
+	/* On tablets/phones (≤ md) the overlay takes the full screen — edge to edge,
+	   so no rounded corners or border. */
 	@include respond-to('md') {
 		width: 100vw;
 		max-width: 100vw;
-		border-left: none;
+		border: none;
+		border-radius: 0;
 	}
 
 	&__head {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 16px 16px 10px;
+		padding: 14px 16px;
+		border-bottom: 1px solid var(--color-border);
+		flex-shrink: 0;
 	}
 
 	&__title {
@@ -626,10 +630,11 @@ onMounted(() => {
 		display: flex;
 		align-items: center;
 		gap: 6px;
-		padding: 12px;
+		padding: 10px 16px;
 		border-bottom: 1px solid var(--sidebar-border, var(--color-border));
 		font-size: 11px;
 		color: var(--text-muted, var(--color-text-muted));
+		flex-shrink: 0;
 	}
 
 	&__meta-sep {
