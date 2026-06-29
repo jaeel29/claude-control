@@ -33,7 +33,7 @@ const options: Record<TabKey, { command: string; cmdLabel: string; hint: string 
 	npm: {
 		command: 'npx claudecontrolai',
 		cmdLabel: 'your terminal',
-		hint: 'Run it in your terminal — needs Node 20+. The dashboard opens at localhost:3001.',
+		hint: 'Run it in your terminal — needs Node 20+. Opens at localhost:3001. Add --bind tailnet to reach it from your phone.',
 	},
 	claude: {
 		command: 'install and run claudecontrolai',
