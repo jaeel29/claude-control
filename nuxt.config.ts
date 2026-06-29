@@ -18,6 +18,22 @@ export default defineNuxtConfig({
       scrollBehaviorType: 'smooth',
     },
   },
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // Auto-inject the breakpoint mixins into every <style lang="scss">
+          // block, so components call respond-to()/respond-from() without an
+          // import. Function form (not a string): guard on the importer so the
+          // plain .css files in css:[] don't get `@use` prepended (invalid CSS).
+          additionalData(source: string, filename: string) {
+            if (filename.endsWith('.css')) return source
+            return `@use "~/assets/css/_breakpoints.scss" as *;\n${source}`
+          },
+        },
+      },
+    },
+  },
   nitro: {
     experimental: { wasm: false }
   },

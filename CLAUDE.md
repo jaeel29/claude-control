@@ -66,6 +66,18 @@ Nitro file-based routing. Endpoints in `server/api/`, logic in `server/utils/`:
 - Use `~/` alias for app imports; server utils import via relative paths (`../utils/...`).
 - Match existing file naming: `*.get.ts` / `*.post.ts` / `*.put.ts` / `*.delete.ts` for API routes; dynamic segments as `[param]`.
 
+### Responsive Rule — make everything responsive
+
+**Every new component, layout, and page MUST be responsive** — build it responsive from the start, don't ship desktop-only. Verify down to `xxs` (375px).
+
+- Breakpoints are one source of truth: `app/assets/css/_breakpoints.scss` (Sass) with a JS twin in `app/utils/breakpoints.ts`. Scale (mobile-first): `xxs` 375 · `xs` 480 · `sm` 640 · `md` 768 · `lg` 960 · `xl` 1200.
+- **Never hardcode a `@media (max-width: …)`** — snap to the nearest token via the mixins, which are **auto-injected** into every `<style lang="scss">` (no import needed):
+  - `respond-to('md')` → `max-width` (the breakpoint and below — the common case)
+  - `respond-from('lg')` → `min-width` of bp+1px (strictly above)
+  - `respond-between('sm','lg')` → a range
+- A component adding responsive rules needs `<style scoped lang="scss">` (plain CSS is valid SCSS — just change the `lang`).
+- **JS-driven** responsiveness (only when a layout value is bound to reactive state and can't be pure CSS): use `useBreakpoint('lg', 'down')` (reactive, client-only). Pair it with a CSS `respond-to` belt for the same breakpoint to avoid a pre-hydration flash.
+
 ## Version Control
 
 This repo lives on **GitHub** (`github.com/jaeel29/claude-control`). Use **`gh`** for PRs (`gh pr view/diff/list`).

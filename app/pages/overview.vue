@@ -272,7 +272,7 @@ function modeColor(mode: string) {
 	</div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 /* ── Page header ── */
 .page-header {
 	margin-bottom: 28px;
@@ -282,6 +282,10 @@ function modeColor(mode: string) {
 	font-weight: 700;
 	color: var(--text-primary);
 	letter-spacing: -0.02em;
+
+	@include respond-to('sm') {
+		font-size: 19px;
+	}
 }
 .page-subtitle {
 	font-size: 13px;
@@ -295,12 +299,23 @@ function modeColor(mode: string) {
 	grid-template-columns: repeat(3, 1fr);
 	gap: 8px;
 	margin-bottom: 28px;
+
+	@include respond-to('md') {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	@include respond-to('xs') {
+		grid-template-columns: 1fr;
+	}
 }
 .stat-card {
 	background: var(--bg-card);
 	border: 1px solid var(--border);
 	border-radius: 16px;
 	padding: 24px;
+
+	@include respond-to('sm') {
+		padding: 18px;
+	}
 }
 .stat-value {
 	font-size: 24px;

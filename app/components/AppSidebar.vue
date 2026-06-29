@@ -4,6 +4,7 @@ const route = useRoute()
 const { data: stats } = useLazyFetch('/api/stats', { server: false })
 const { data: projectsData } = useLazyFetch('/api/projects', { server: false })
 
+const { open } = useSidebar()
 const { selectedTheme, setTheme } = useTheme()
 const themeOptions = [
   { value: 'light', icon: 'icons:theme-light', label: 'Light' },
@@ -18,13 +19,13 @@ const projects = computed(() =>
 )
 
 const nav = [
-  { label: 'Overview',  href: '/overview', icon: 'lucide:layout-dashboard' },
+  { label: 'Overview',  href: '/overview', icon: 'lucide:house' },
   { label: 'Activity',  href: '/activity',  icon: 'lucide:activity' },
   { label: 'Agents',    href: '/agents',    icon: 'lucide:bot' },
   // { label: 'Tasks',     href: '/tasks',     icon: 'lucide:check-square' },
   { label: 'Logs',      href: '/logs',      icon: 'lucide:scroll-text' },
   // { label: 'Run',       href: '/run',       icon: 'lucide:send' },
-  { label: 'Usage',     href: '/usage',     icon: 'lucide:bar-chart-2' },
+  { label: 'Usage', href: '/usage',     icon: 'lucide:chart-pie' },
   // { label: 'Test',      href: '/test',      icon: 'lucide:flask-conical' },
 ]
 
@@ -43,7 +44,7 @@ function projectInitial(name: string) {
 </script>
 
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" :class="{ 'sidebar--open': open }">
 
     <!-- ── Workspace (click → landing page) ── -->
     <NuxtLink to="/" class="workspace" title="Back to home">
@@ -132,7 +133,7 @@ function projectInitial(name: string) {
   </aside>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .sidebar {
   width: var(--sidebar-w);
   flex-shrink: 0;
@@ -142,6 +143,25 @@ function projectInitial(name: string) {
   padding: 16px 12px;
   gap: 1px;
   overflow-y: auto;
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+
+  /* Off-canvas drawer ≤ md: slide in from the left over a backdrop (the
+     backdrop + hamburger live in the layout). Toggled by .sidebar--open. */
+  @include respond-to('md') {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.18);
+
+    &--open {
+      transform: translateX(0);
+    }
+  }
 }
 
 /* ── Workspace ── */
@@ -357,7 +377,7 @@ function projectInitial(name: string) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 36px;
+  height: 32px;
   border: none;
   border-radius: 8px;
   background: transparent;
@@ -372,6 +392,7 @@ function projectInitial(name: string) {
 .theme-toggle__btn.active {
   background: color-mix(in srgb, var(--color-text) 5%, transparent);
   color: var(--text-primary);
+  box-shadow: var(--glass-card-shadow);
   /* box-shadow: var(--shadow-sm); */
 }
 

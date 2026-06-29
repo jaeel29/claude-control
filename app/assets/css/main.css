@@ -41,6 +41,15 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 }
 
+/* Dashboard: lock the outer page to the viewport so it never scrolls as a whole.
+   Only the inner panels (.main and the chat widget body) scroll. The class is
+   added by the default layout and removed on the landing page (which scrolls). */
+html.dash-locked,
+html.dash-locked body {
+	height: 100%;
+	overflow: hidden;
+}
+
 /* ── Dashboard tokens ──────────────────────────────────────
    These legacy dashboard token names are ALIASED onto the design-system tokens
    in assets/css/variables.css (--color-*), so the dashboard follows the same
@@ -163,23 +172,36 @@ body {
 /* ── App Shell ─────────────────────────────────────────── */
 .app-shell {
 	display: flex;
-	height: 100dvh;
-	background: var(--bg-global);
-	color: var(--text-primary);
+	gap: 6px;
+	height: calc(100dvh - 12px);
+	/* background: var(--bg-global); */
+	/* color: var(--text-primary); */
+	/* border: 1px solid var(--color-border); */
+	/* border-radius: 16px; */
 	overflow: hidden;
+	margin: 6px;
 }
 
 .main {
 	flex: 1;
-	overflow-y: auto;
+	overflow: auto;
 	background: var(--bg-global);
-	border-left: 1px solid var(--sidebar-border);
+	border: 1px solid var(--color-border);
+	border-radius: 16px;
 }
 
 .page {
 	max-width: 920px;
 	margin: 0 auto;
 	padding: 36px 32px;
+}
+
+/* Only place a hardcoded @media is acceptable: main.css is plain CSS (no SCSS
+   mixin auto-injection). 640px == the `sm` breakpoint token. */
+@media (max-width: 640px) {
+	.page {
+		padding: 20px 16px;
+	}
 }
 
 /* ── Global animations ─────────────────────────────────── */
