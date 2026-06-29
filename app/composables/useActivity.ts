@@ -4,6 +4,10 @@ export interface ConversationMessage {
 	fullText: string;
 	timestamp: string;
 	toolName?: string;
+	/** Global indices of any images attached to this message (served lazily). */
+	images?: number[];
+	/** Parsed todo list when the tool is TodoWrite — rendered as a checklist. */
+	todos?: { content: string; status: 'pending' | 'in_progress' | 'completed' }[];
 }
 
 export interface ActivityItem {

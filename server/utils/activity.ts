@@ -10,6 +10,8 @@ export interface ConversationMessage {
   fullText: string
   timestamp: string
   toolName?: string
+  images?: number[]
+  todos?: { content: string; status: 'pending' | 'in_progress' | 'completed' }[]
 }
 
 export interface ActivityItem {
