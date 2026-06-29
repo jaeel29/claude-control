@@ -31,12 +31,37 @@ Then open **http://localhost:3001**.
 ## Usage
 
 ```bash
-npx claudecontrolai             # start on http://localhost:3001
-npx claudecontrolai --port 4000 # use a different port
-npx claudecontrolai --help      # show options
+npx claudecontrolai                  # start on http://localhost:3001
+npx claudecontrolai --port 4000      # use a different port
+npx claudecontrolai --bind tailnet   # reach it from your phone (see below)
+npx claudecontrolai --help           # show options
 ```
 
 The dashboard polls your local Claude Code data and refreshes automatically.
+
+## Track Claude Code from your phone
+
+Your sessions live on your computer, so the dashboard runs there — but you can
+open it on your phone's browser over your own private network using
+[Tailscale](https://tailscale.com) (free):
+
+1. Install Tailscale on **your computer and your phone**, and sign in to the same
+   account on both (`tailscale up` on the computer).
+2. Start the dashboard bound to your tailnet:
+
+   ```bash
+   npx claudecontrolai --bind tailnet
+   ```
+
+3. The terminal prints a **private URL** (a `100.x.y.z` address) and an **access
+   token**. Open that URL in your phone's browser and enter the token.
+
+Notes:
+- It only works while your **computer is awake and online** — there's no cloud copy.
+- Remote access is **view-only by default** (you can watch, not run). To also start
+  or stop runs from your phone, add `--allow-remote-run`.
+- The access token is saved to `~/.claudecontrol/token` so it stays the same
+  between runs.
 
 ## How it works
 

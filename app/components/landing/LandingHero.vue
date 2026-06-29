@@ -7,7 +7,7 @@
 		</h1>
 		<p class="hero__sub">
 			See what Claude Code is doing on your computer — live sessions, past chats, and what each run
-			costs. Run one command and it opens right in your browser.
+			costs. Run one command — and check it from your phone whenever you are away.
 		</p>
 		<div class="hero__cmd">
 			<LandingInstall />

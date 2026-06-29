@@ -53,8 +53,12 @@ const faqs = [
 		a: 'Yes. You can start a new task, resume a past session, or stop a run — straight from the dashboard, no terminal needed.',
 	},
 	{
+		q: 'How do I open it on my phone?',
+		a: 'Install Tailscale (free) on your computer and phone, then run: npx claudecontrolai --bind tailnet. It prints a private link and an access token — open the link on your phone and enter the token. Your computer must stay awake. Remote is view-only unless you add --allow-remote-run.',
+	},
+	{
 		q: 'What do I need to get started?',
-		a: 'Node 20 or newer and the Claude Code CLI you already use. That is everything.',
+		a: 'Node 20 or newer and the Claude Code CLI you already use. For phone access, add Tailscale. That is everything.',
 	},
 ];
 

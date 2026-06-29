@@ -11,8 +11,8 @@
 		</div>
 
 		<div class="how__phone">
-			<p class="how__phone-label">That's it — one command:</p>
-			<LandingCommandBlock command="npx claudecontrolai" label="your terminal" />
+			<p class="how__phone-label">To open it on your phone, start it like this instead:</p>
+			<LandingCommandBlock command="npx claudecontrolai --bind tailnet" label="phone access" />
 		</div>
 	</section>
 </template>
@@ -33,8 +33,8 @@ const steps = [
 	},
 	{
 		n: '3',
-		title: 'Watch it live',
-		body: 'See active sessions, full conversations, and what each run costs — refreshed automatically.',
+		title: 'Add your phone (optional)',
+		body: 'Want to check it on the go? Run it with --bind tailnet and open the same dashboard on your phone over your private Tailscale network.',
 	},
 ];
 </script>
