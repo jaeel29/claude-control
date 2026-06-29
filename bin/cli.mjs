@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * claude-control launcher.
+ * claudecontrolai launcher.
  *
  * Boots the prebuilt Nitro server (.output/server/index.mjs) on localhost.
  * This is a local-only tool — it reads your machine's ~/.claude data and shows
  * it in your browser. No accounts, no auth, nothing leaves your computer.
  *
- *   npx claude-control            # http://localhost:3001
- *   npx claude-control --port 4000
+ *   npx claudecontrolai            # http://localhost:3001
+ *   npx claudecontrolai --port 4000
  */
 
 import { spawn } from 'node:child_process'
@@ -30,10 +30,10 @@ function parseArgs(argv) {
 
 function help() {
   console.log(`
-claude-control — a local dashboard for your Claude Code sessions
+claudecontrolai — a local dashboard for your Claude Code sessions
 
 Usage:
-  claude-control [options]
+  claudecontrolai [options]
 
 Options:
   --port <n>     port to listen on (default 3001)
@@ -62,7 +62,7 @@ const env = {
 }
 
 console.log('')
-console.log('  claude-control')
+console.log('  claudecontrolai')
 console.log('  ──────────────────────────────────────────')
 console.log(`  dashboard:  http://localhost:${args.port}`)
 console.log('  ──────────────────────────────────────────')

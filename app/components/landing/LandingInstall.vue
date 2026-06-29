@@ -31,12 +31,12 @@ const tabs: { key: TabKey; label: string }[] = [
 
 const options: Record<TabKey, { command: string; cmdLabel: string; hint: string }> = {
 	npm: {
-		command: 'npx claude-control',
+		command: 'npx claudecontrolai',
 		cmdLabel: 'your terminal',
 		hint: 'Run it in your terminal — needs Node 20+. The dashboard opens at localhost:3001.',
 	},
 	claude: {
-		command: 'Install and run claude-control',
+		command: 'install and run claudecontrolai',
 		cmdLabel: 'ask Claude Code',
 		hint: 'Not comfortable with the terminal? Paste this into Claude Code and it sets everything up for you.',
 	},

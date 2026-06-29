@@ -37,28 +37,24 @@ import BaseBadge from '~/components/ui/BaseBadge.vue';
 
 const faqs = [
 	{
-		q: 'What is claude-control, in one sentence?',
+		q: 'What is claudecontrolai, in one sentence?',
 		a: 'It is a simple dashboard that shows you everything Claude Code is doing on your computer — live sessions, past conversations, and how much each run costs.',
+	},
+	{
+		q: 'How do I run it?',
+		a: 'Run npx claudecontrolai in your terminal and open the dashboard in your browser. Nothing to install, no sign-up.',
 	},
 	{
 		q: 'Where does my data go?',
 		a: 'Nowhere. Everything runs on your own computer and reads files Claude Code already saved there. There is no cloud, no account, and nothing is ever uploaded.',
 	},
 	{
-		q: 'How do I open it on my phone?',
-		a: 'Install Tailscale (free) on your computer and phone, then start it with: npx claude-control --bind tailnet. It prints a link and a password — open the link on your phone and enter the password.',
-	},
-	{
-		q: 'Is the phone view safe?',
-		a: 'Yes. It is locked behind a password, and with Tailscale only your own devices can reach it. By default the phone view is look-only — you can watch, but starting or stopping runs from your phone is off unless you turn it on.',
-	},
-	{
-		q: 'Does my computer have to stay on?',
-		a: 'Yes. Your data lives on your computer, so it needs to be awake and online for the phone view to work. There is no copy of your data anywhere else.',
+		q: 'Can I run Claude from the dashboard?',
+		a: 'Yes. You can start a new task, resume a past session, or stop a run — straight from the dashboard, no terminal needed.',
 	},
 	{
 		q: 'What do I need to get started?',
-		a: 'Node 20 or newer and the Claude Code CLI you already use. For phone access, add Tailscale. That is everything.',
+		a: 'Node 20 or newer and the Claude Code CLI you already use. That is everything.',
 	},
 ];
 

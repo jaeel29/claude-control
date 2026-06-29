@@ -4,7 +4,7 @@
 		<h2>One command. That's it.</h2>
 		<p class="cta__sub">Paste this into your terminal and your dashboard opens.</p>
 		<div class="cta__cmd">
-			<LandingCommandBlock command="npx claude-control" label="your terminal" />
+			<LandingCommandBlock command="npx claudecontrolai" label="your terminal" />
 		</div>
 		<BaseButton to="/overview" variant="primary" size="lg" radius="rounded">Open the dashboard</BaseButton>
 	</section>

@@ -41,11 +41,11 @@ const features: { label: string; color: BadgeColor; icon: string; title: string;
 		body: 'Start a new task, pick up where an old session left off, or stop a run that is going the wrong way — all with a click, no terminal needed.',
 	},
 	{
-		label: 'On your phone',
+		label: 'Usage & history',
 		color: 'purple',
-		icon: 'lucide:smartphone',
-		title: 'Check in from anywhere.',
-		body: 'Started a long task and walked away? Open the same dashboard on your phone and watch it finish — even when you are away from your computer.',
+		icon: 'lucide:history',
+		title: 'Every session, kept.',
+		body: 'Browse past conversations, tool history, and per-project usage — all read from your local Claude Code data, nothing uploaded.',
 	},
 ];
 </script>

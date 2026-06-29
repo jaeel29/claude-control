@@ -20,7 +20,7 @@ useHead({
 		{
 			name: 'description',
 			content:
-				'A local dashboard for your Claude Code sessions. Run one command, open it in your browser — and check on it from your phone over Tailscale.',
+				'A local dashboard for your Claude Code sessions. Run one command and watch live activity, history, and cost — right in your browser.',
 		},
 	],
 });

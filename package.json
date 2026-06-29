@@ -1,11 +1,23 @@
 {
-  "name": "claude-control",
+  "name": "claudecontrolai",
   "version": "0.1.0",
-  "description": "Local dashboard to monitor and control your Claude Code sessions — with optional remote (Tailscale) access from your phone.",
+  "description": "A local dashboard for your Claude Code sessions — live activity, history, and cost, in your browser.",
   "type": "module",
   "packageManager": "bun@1.3.10",
   "bin": {
-    "claude-control": "bin/cli.mjs"
+    "claudecontrolai": "bin/cli.mjs"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "dashboard",
+    "cli",
+    "ai"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaeel29/claude-control.git"
   },
   "files": [
     "bin",
