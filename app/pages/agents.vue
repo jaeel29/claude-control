@@ -194,7 +194,7 @@ function toolList(tools: string) {
 }
 .agent-icon.project-icon {
   background: var(--blue-dim);
-  border-color: rgba(59, 130, 246, 0.2);
+  border-color: var(--badge-blue-glass-border);
 }
 .agent-name {
   font-size: 13px;

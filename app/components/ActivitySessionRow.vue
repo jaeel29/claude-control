@@ -87,7 +87,7 @@ function formatText(text: string) {
 	</div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .session-row {
 	background: var(--bg-card);
 	border: 1px solid transparent;
@@ -98,10 +98,16 @@ function formatText(text: string) {
 	gap: 14px;
 	box-shadow: var(--shadow-sm);
 	cursor: pointer;
-	transition: border-color 0.15s;
+	transition: border-color 0.15s, background 0.15s;
 }
 .session-row:hover {
-	border-color: #dadada;
+	border-color: var(--color-text-subtle);
+	background: var(--bg-card-hover);
+}
+.session-row:focus-visible {
+	outline: none;
+	border-color: var(--color-text-muted);
+	box-shadow: 0 0 0 3px var(--accent-dim);
 }
 .row-badge {
 	flex-shrink: 0;
@@ -117,15 +123,15 @@ function formatText(text: string) {
 	width: 26px;
 	height: 26px;
 	border-radius: 50%;
-	border: 1px solid rgba(229, 62, 62, 0.25);
-	background: rgba(229, 62, 62, 0.07);
-	color: #e53e3e;
+	border: 1px solid var(--badge-red-glass-border);
+	background: var(--badge-red-glass-bg);
+	color: var(--badge-red-stroke-text);
 	cursor: pointer;
 	transition: background 0.15s, border-color 0.15s;
 }
 .stop-btn:hover:not(:disabled) {
-	background: rgba(229, 62, 62, 0.15);
-	border-color: rgba(229, 62, 62, 0.5);
+	background: var(--badge-red-light-bg);
+	border-color: var(--badge-red-stroke-border);
 }
 .stop-btn:disabled { opacity: 0.5; cursor: default; }
 @keyframes spin { to { transform: rotate(360deg); } }

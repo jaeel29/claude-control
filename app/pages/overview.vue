@@ -401,7 +401,7 @@ function modeColor(mode: string) {
 	border-bottom: none;
 }
 .card-row:hover {
-	background: #f5f5f5;
+	background: var(--bg-card-hover);
 }
 
 /* ── Empty ── */
@@ -492,9 +492,9 @@ function modeColor(mode: string) {
 	gap: 12px;
 	padding: 10px 0;
 	background: var(--bg-card);
-  border: 1px solid #ededed;
-  border-radius: 10px;
-  padding: 10px;
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	padding: 10px;
 }
 .detail-label {
 	font-size: 12px;

@@ -30,6 +30,14 @@ const classes = computed(() => [
 </script>
 
 <style scoped lang="scss">
+/* Frosted "glass" badges driven by the --badge-*-glass-* design tokens, so
+   light/dark both adapt automatically (mirrors BaseBadge's glass variant). */
+@mixin badge-glass($c) {
+	background: var(--badge-#{$c}-glass-bg);
+	color: var(--badge-#{$c}-glass-text);
+	border-color: var(--badge-#{$c}-glass-border);
+}
+
 .badge {
 	display: inline-flex;
 	align-items: center;
@@ -39,6 +47,8 @@ const classes = computed(() => [
 	white-space: nowrap;
 	line-height: 1;
 	border: 1px solid transparent;
+	box-shadow: var(--badge-glass-shadow);
+	text-shadow: var(--badge-glass-text-shadow);
 
 	&--sm {
 		padding: 2px 8px;
@@ -50,65 +60,24 @@ const classes = computed(() => [
 		font-size: 12px;
 	}
 
-	// ── Colors ──────────────────────────────────────────────
-	&--gray {
-		background: #f3f4f6;
-		color: #4b5563;
-		border-color: #e5e7eb;
-	}
+	// ── Colors (glass tokens) ───────────────────────────────
+	&--gray   { @include badge-glass(gray); }
+	&--blue   { @include badge-glass(blue); }
+	&--green  { @include badge-glass(green); }
+	&--yellow { @include badge-glass(yellow); }
+	&--red    { @include badge-glass(red); }
+	&--orange { @include badge-glass(orange); }
+	&--purple { @include badge-glass(purple); }
+	&--teal   { @include badge-glass(teal); }
+	&--pink   { @include badge-glass(pink); }
 
-	&--blue {
-		background: rgba(59, 130, 246, 0.1);
-		color: #2563eb;
-		border-color: rgba(59, 130, 246, 0.2);
-	}
-
-	&--green {
-		background: rgba(16, 185, 129, 0.1);
-		color: #059669;
-		border-color: rgba(16, 185, 129, 0.2);
-	}
-
-	&--yellow {
-		background: rgba(245, 158, 11, 0.1);
-		color: #d97706;
-		border-color: rgba(245, 158, 11, 0.2);
-	}
-
-	&--red {
-		background: rgba(239, 68, 68, 0.08);
-		color: #dc2626;
-		border-color: rgba(239, 68, 68, 0.18);
-	}
-
-	&--orange {
-		background: rgba(249, 115, 22, 0.1);
-		color: #ea580c;
-		border-color: rgba(249, 115, 22, 0.2);
-	}
-
-	&--purple {
-		background: rgba(139, 92, 246, 0.1);
-		color: #7c3aed;
-		border-color: rgba(139, 92, 246, 0.2);
-	}
-
-	&--teal {
-		background: rgba(0, 182, 149, 0.08);
-		color: #00b695;
-		border-color: rgba(0, 182, 149, 0.22);
-	}
-
-	&--pink {
-		background: rgba(236, 72, 153, 0.08);
-		color: #db2777;
-		border-color: rgba(236, 72, 153, 0.18);
-	}
-
+	// outline → neutral gray stroke (transparent fill)
 	&--outline {
 		background: transparent;
-		color: #6b7280;
-		border-color: #d1d5db;
+		color: var(--badge-gray-stroke-text);
+		border-color: var(--badge-gray-stroke-border);
+		box-shadow: none;
+		text-shadow: none;
 	}
 }
 

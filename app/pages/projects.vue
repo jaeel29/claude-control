@@ -197,10 +197,10 @@ function relativeTime(ts: string | null) {
   box-shadow: var(--shadow);
 }
 .project-card.project-active {
-  border-color: rgba(16, 185, 129, 0.25);
+  border-color: var(--badge-green-glass-border);
 }
 .project-card.project-active:hover {
-  border-color: rgba(16, 185, 129, 0.4);
+  border-color: var(--badge-green-stroke-border);
 }
 
 /* ── Project card header ── */
@@ -224,7 +224,7 @@ function relativeTime(ts: string | null) {
 }
 .project-card.project-active .project-icon {
   background: var(--green-dim);
-  border-color: rgba(16, 185, 129, 0.25);
+  border-color: var(--badge-green-glass-border);
   color: var(--green);
 }
 .project-title-group {

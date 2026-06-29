@@ -90,27 +90,22 @@ onUnmounted(() => document.removeEventListener('mousedown', outside));
 	padding: 5px 8px;
 	min-width: 120px;
 	height: 32px;
-	background: #fff;
-	border: none;
+	background: var(--bg-card);
+	border: 1px solid var(--border);
 	border-radius: 8px;
 	font-size: 12px;
 	font-weight: 500;
-	color: #414746;
+	color: var(--text-primary);
 	cursor: pointer;
-	box-shadow: 0 0 0px 1px #cdcdcd;
-	transition: border-color 0.15s;
-
-	[data-theme='dark'] & {
-		border-color: rgba(220, 228, 229, 0.1);
-		color: rgba(255, 255, 255, 0.6);
-	}
+	transition: border-color 0.15s, background 0.15s;
 
 	&:hover {
-		border-color: #d0cdc8;
+		border-color: var(--color-text-subtle);
+		background: var(--bg-card-hover);
+	}
 
-		[data-theme='dark'] & {
-			border-color: rgba(220, 228, 229, 0.2);
-		}
+	&[aria-expanded='true'] {
+		border-color: var(--color-text-muted);
 	}
 }
 
@@ -122,11 +117,7 @@ onUnmounted(() => document.removeEventListener('mousedown', outside));
 	white-space: nowrap;
 
 	&--placeholder {
-		color: #b0b8b7;
-
-		[data-theme='dark'] & {
-			color: rgba(255, 255, 255, 0.25);
-		}
+		color: var(--text-muted);
 	}
 }
 
@@ -145,19 +136,12 @@ onUnmounted(() => document.removeEventListener('mousedown', outside));
 	top: calc(100% + 4px);
 	right: 0;
 	min-width: 168px;
-	background:  #fff;
-	border: 1px solid #e8eaea;
+	background: var(--bg-card);
+	border: 1px solid var(--border);
 	border-radius: 10px;
-	box-shadow:
-		0 4px 16px rgba(0, 0, 0, 0.08),
-		0 1px 3px rgba(0, 0, 0, 0.04);
+	box-shadow: var(--shadow-card);
 	padding: 4px;
 	z-index: 100;
-
-	[data-theme='dark'] & {
-		border-color: rgba(255, 255, 255, 0.1);
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-	}
 }
 
 .dd-search {
@@ -165,13 +149,8 @@ onUnmounted(() => document.removeEventListener('mousedown', outside));
 	align-items: center;
 	gap: 6px;
 	padding: 5px 8px;
-	// border-bottom: 1px solid #e8eaea;
 	margin-bottom: 4px;
 	height: 32px;
-
-	[data-theme='dark'] & {
-		border-color: rgba(255, 255, 255, 0.08);
-	}
 }
 
 .dd-search-icon {
@@ -186,19 +165,11 @@ onUnmounted(() => document.removeEventListener('mousedown', outside));
 	background: transparent;
 	font-size: 12px;
 	font-weight: 500;
-	color: #414746;
+	color: var(--text-primary);
 	width: 100%;
 
 	&::placeholder {
-		color: #b0b8b7;
-	}
-
-	[data-theme='dark'] & {
-		color: rgba(255, 255, 255, 0.7);
-
-		&::placeholder {
-			color: rgba(255, 255, 255, 0.25);
-		}
+		color: var(--text-muted);
 	}
 }
 
@@ -214,43 +185,26 @@ onUnmounted(() => document.removeEventListener('mousedown', outside));
 .dd-empty {
 	padding: 7px 10px;
 	font-size: 12px;
-	color: #b0b8b7;
+	color: var(--text-muted);
 	text-align: center;
-
-	[data-theme='dark'] & {
-		color: rgba(255, 255, 255, 0.3);
-	}
 }
 
 .dd-item {
 	padding: 7px 10px;
 	font-size: 12px;
 	font-weight: 500;
-	color: #414746;
+	color: var(--text-secondary);
 	border-radius: 7px;
 	cursor: pointer;
 	transition: background 0.1s;
 
-	[data-theme='dark'] & {
-		color: rgba(255, 255, 255, 0.7);
-	}
-
 	&:hover {
-		background: #f3f4f3;
-
-		[data-theme='dark'] & {
-			background: rgba(255, 255, 255, 0.06);
-		}
+		background: var(--bg-card-hover);
 	}
 
 	&--active {
-		background: #eef0ee;
-		color: #1b2020;
-
-		[data-theme='dark'] & {
-			background: rgba(255, 255, 255, 0.1);
-			color: #fff;
-		}
+		background: var(--accent-dim);
+		color: var(--text-primary);
 	}
 }
 
@@ -261,30 +215,18 @@ onUnmounted(() => document.removeEventListener('mousedown', outside));
 	.dd-trigger {
 		width: 100%;
 		height: 36px;
-		border: none;
+		border: 1px solid var(--border);
 		border-radius: 8px;
-		box-shadow: 0 0 0 1px #e8e8e8;
 		font-size: 13px;
-		color: #012c32;
+		color: var(--text-primary);
 		padding: 0 12px;
 		transition: all 0.15s cubic-bezier(0, 1, 1, 1.01);
 
-		&:hover {
-			border-color: unset;
-		}
-
 		&:focus,
 		&[aria-expanded='true'] {
-			box-shadow:
-				0 0 0 1.5px #00b695,
-				0 0 0 4px rgba(0, 182, 149, 0.2);
+			border-color: var(--accent);
+			box-shadow: 0 0 0 3px var(--accent-dim);
 			outline: none;
-		}
-
-		[data-theme='dark'] & {
-			color: rgba(255, 255, 255, 0.9);
-			box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
-			background: rgba(255, 255, 255, 0.04);
 		}
 	}
 

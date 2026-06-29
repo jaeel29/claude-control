@@ -190,7 +190,8 @@ function open(group: SessionGroup) {
 	transition: border-color 0.15s;
 }
 .activity-clickable:hover {
-	border-color: #dadada;
+	border-color: var(--color-text-subtle);
+	background: var(--bg-card-hover);
 }
 .activity-badge-col {
 	flex-shrink: 0;

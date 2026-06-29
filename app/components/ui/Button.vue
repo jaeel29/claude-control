@@ -107,7 +107,7 @@ const textClasses = computed(() => ['button__text']);
 
 	// Default hover/active fallback (for variants without their own hover, e.g. always-white)
 	&:hover:not(.button--disabled) {
-		background-color: #f5f5f5;
+		background-color: var(--bg-card-hover);
 	}
 
 	&:active:not(.button--disabled) {

@@ -227,8 +227,8 @@ function topTools(toolCalls: Record<string, number>) {
 	border-color: var(--accent-border);
 }
 .log-item:not(.expanded):hover {
-	/* box-shadow: var(--shadow); */
-	border-color: #dadada;
+	border-color: var(--color-text-subtle);
+	background: var(--bg-card-hover);
 }
 .log-header {
 	display: flex;
