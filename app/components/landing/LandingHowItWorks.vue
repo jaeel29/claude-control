@@ -13,6 +13,9 @@
 		<div class="how__cmd">
 			<p class="how__cmd-label">That's the whole setup — one command:</p>
 			<LandingCommandBlock command="npx claudecontrolai" label="your terminal" />
+			<p class="how__cmd-note">
+				Want it on your phone? Run <code>npx claudecontrolai --bind lan</code> on the same Wi-Fi — it prints a phone URL and an access token.
+			</p>
 		</div>
 	</section>
 </template>
@@ -69,6 +72,23 @@ const steps = [
 			color: var(--color-text-muted);
 			font-size: 14px;
 			margin: 0 0 14px;
+		}
+
+		&-note {
+			color: var(--color-text-subtle);
+			font-size: 13px;
+			line-height: 1.6;
+			margin: 14px 0 0;
+
+			code {
+				font-family: var(--font-mono, ui-monospace, monospace);
+				font-size: 12px;
+				padding: 1px 6px;
+				border-radius: 6px;
+				background: var(--color-surface-muted);
+				border: 1px solid var(--color-border);
+				color: var(--color-text);
+			}
 		}
 	}
 }
