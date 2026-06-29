@@ -1,0 +1,37 @@
+// Shared landing-section primitives. Each landing component @use's this so the
+// section wrapper, headline sizing, glass-card treatment, and badge centering
+// stay consistent without duplicating values.
+
+@mixin section {
+	max-width: 960px;
+	margin: 0 auto;
+	padding: 96px 24px;
+
+	@media (max-width: 760px) {
+		padding: 64px 20px;
+	}
+}
+
+@mixin headline {
+	color: var(--headline-color);
+	letter-spacing: -0.02em;
+	line-height: 1.1;
+	font-weight: 600;
+}
+
+// Frosted glass card used by feature / step / security cards.
+@mixin glass-card {
+	border: 1px solid var(--glass-card-border);
+	background: var(--glass-card-bg);
+	box-shadow: var(--glass-card-shadow);
+	backdrop-filter: blur(var(--glass-card-blur));
+	-webkit-backdrop-filter: blur(var(--glass-card-blur));
+}
+
+// Center the eyebrow BaseBadge over a centered headline (badge is display:flex).
+@mixin centered-badge {
+	:deep(.badge) {
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
