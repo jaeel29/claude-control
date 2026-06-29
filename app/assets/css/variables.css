@@ -1,0 +1,316 @@
+/* Design tokens for claude-control — light (:root) + dark ([data-theme='dark']).
+   Badge palette ported from the Diali.ai design system so BaseBadge renders
+   identically. Theme is toggled by useTheme() setting data-theme on <html>. */
+
+:root {
+	/* ── Core surfaces / text ── */
+	--color-bg: #fbfbfa; /* page background (light) */
+	--color-bg-alt: #f4f4f3;
+	--color-surface: #ffffff; /* cards */
+	--color-surface-muted: #f4f5f7;
+	--color-border: #e7e7e4;
+	--color-border-subtle: rgba(0, 0, 0, 0.06);
+
+	--color-text: #161613; /* primary text */
+	--color-text-muted: rgba(22, 22, 19, 0.62); /* body / secondary */
+	--color-text-subtle: rgba(22, 22, 19, 0.42);
+
+	--color-white: #ffffff;
+	--headline-color: #0c0c0a;
+
+	/* Accent — teal, matches the dashboard accent */
+	--color-accent: #00b695;
+	--color-accent-vivid: #00b695;
+	--color-accent-deep: #0d9488;
+
+	/* ── Fonts / spacing / radius ── */
+	--font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+	--font-mono: 'SF Mono', ui-monospace, Menlo, monospace;
+
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 0.75rem;
+	--space-4: 1rem;
+	--space-6: 1.5rem;
+	--space-8: 2rem;
+
+	--radius-sm: 0.5rem;
+	--radius-md: 0.75rem;
+	--radius-lg: 1rem;
+	--radius-full: 9999px;
+
+	--shadow-card: 0px 4px 12px rgba(0, 0, 0, 0.05), 0px 1px 3px rgba(0, 0, 0, 0.04);
+
+	/* ── Scrollbar ── */
+	--scrollbar-thumb: rgba(0, 0, 0, 0.28);
+	--scrollbar-thumb-hover: rgba(0, 0, 0, 0.42);
+	--scrollbar-track-line: var(--color-border);
+
+	/* ── Glass cards (landing) ── */
+	--glass-card-bg: rgba(255, 255, 255, 0.55);
+	--glass-card-border: rgba(0, 0, 0, 0.07);
+	--glass-card-shadow: 0 1.5px 2px 0 rgba(255, 255, 255, 0.6) inset, 0 8px 28px rgba(0, 0, 0, 0.05);
+	--glass-card-blur: 14px;
+
+	/* ── BaseBadge palette (consumed by components/ui/BaseBadge.vue) ── */
+	--badge-glass-shadow: 0 2px 2px 0 rgba(255, 255, 255, 0.8) inset;
+	--badge-glass-text-shadow: 0 0.25px 0 #fff;
+	--badge-glass-shadow-on-dark: 0 1px 1px 0 rgba(255, 255, 255, 0.18) inset;
+	--badge-glass-text-shadow-on-dark: 0 1px 1px rgba(0, 0, 0, 0.4);
+
+	--badge-gray-filled: #7b7b7b;
+	--badge-gray-light-bg: #f3f4f6;
+	--badge-gray-light-text: #4b5563;
+	--badge-gray-lighter-bg: #f9fafb;
+	--badge-gray-lighter-text: #6b7280;
+	--badge-gray-stroke-text: #6b7280;
+	--badge-gray-stroke-border: #d1d5db;
+	--badge-gray-glass-bg: #eff0f0;
+	--badge-gray-glass-border: #eaebeb;
+	--badge-gray-glass-text: #4b5563;
+
+	--badge-blue-filled: #335cff;
+	--badge-blue-light-bg: #dbeafe;
+	--badge-blue-light-text: #1d4ed8;
+	--badge-blue-lighter-bg: #eff6ff;
+	--badge-blue-lighter-text: #1e40af;
+	--badge-blue-stroke-text: #3b82f6;
+	--badge-blue-stroke-border: #93c5fd;
+	--badge-blue-glass-bg: #dbeafe;
+	--badge-blue-glass-border: #bfdbfe;
+	--badge-blue-glass-text: #1e40af;
+
+	--badge-orange-filled: #fa731a;
+	--badge-orange-light-bg: #fff2e4;
+	--badge-orange-light-text: #ea580c;
+	--badge-orange-lighter-bg: #fff7ed;
+	--badge-orange-lighter-text: #c2410c;
+	--badge-orange-stroke-text: #f97316;
+	--badge-orange-stroke-border: #fdba74;
+	--badge-orange-glass-bg: #fbe8da;
+	--badge-orange-glass-border: #f8d8bf;
+	--badge-orange-glass-text: #ad510b;
+
+	--badge-red-filled: #fb3748;
+	--badge-red-light-bg: #fecaca;
+	--badge-red-light-text: #dc2626;
+	--badge-red-lighter-bg: #fef2f2;
+	--badge-red-lighter-text: #b91c1c;
+	--badge-red-stroke-text: #ef4444;
+	--badge-red-stroke-border: #fca5a5;
+	--badge-red-glass-bg: #fbdadf;
+	--badge-red-glass-border: #f8bfc7;
+	--badge-red-glass-text: #ad0b21;
+
+	--badge-green-filled: #21c16b;
+	--badge-green-light-bg: #dbf8e5;
+	--badge-green-light-text: #16a34a;
+	--badge-green-lighter-bg: #f0fdf4;
+	--badge-green-lighter-text: #15803d;
+	--badge-green-stroke-text: #22c55e;
+	--badge-green-stroke-border: #86efac;
+	--badge-green-glass-bg: #d1fae5;
+	--badge-green-glass-border: #bff8db;
+	--badge-green-glass-text: #156f40;
+
+	--badge-yellow-filled: #f6b51e;
+	--badge-yellow-light-bg: #fef3c7;
+	--badge-yellow-light-text: #d97706;
+	--badge-yellow-lighter-bg: #fffbeb;
+	--badge-yellow-lighter-text: #b45309;
+	--badge-yellow-stroke-text: #eab308;
+	--badge-yellow-stroke-border: #fde047;
+	--badge-yellow-glass-bg: #fef9c3;
+	--badge-yellow-glass-border: #fde68a;
+	--badge-yellow-glass-text: #854d0e;
+
+	--badge-purple-filled: #7d52f4;
+	--badge-purple-light-bg: #e9d5ff;
+	--badge-purple-light-text: #9333ea;
+	--badge-purple-lighter-bg: #faf5ff;
+	--badge-purple-lighter-text: #7c3aed;
+	--badge-purple-stroke-text: #a855f7;
+	--badge-purple-stroke-border: #c084fc;
+	--badge-purple-glass-bg: #ede9fe;
+	--badge-purple-glass-border: #d8b4fe;
+	--badge-purple-glass-text: #6b21a8;
+
+	--badge-sky-filled: #47c2ff;
+	--badge-sky-light-bg: #bae6fd;
+	--badge-sky-light-text: #0284c7;
+	--badge-sky-lighter-bg: #f0f9ff;
+	--badge-sky-lighter-text: #0369a1;
+	--badge-sky-stroke-text: #0ea5e9;
+	--badge-sky-stroke-border: #7dd3fc;
+	--badge-sky-glass-bg: #e0f2fe;
+	--badge-sky-glass-border: #bae6fd;
+	--badge-sky-glass-text: #075985;
+
+	--badge-pink-filled: #fb4ba3;
+	--badge-pink-light-bg: #fbcfe8;
+	--badge-pink-light-text: #db2777;
+	--badge-pink-lighter-bg: #fdf2f8;
+	--badge-pink-lighter-text: #be185d;
+	--badge-pink-stroke-text: #ec4899;
+	--badge-pink-stroke-border: #f9a8d4;
+	--badge-pink-glass-bg: #fce7f3;
+	--badge-pink-glass-border: #f9a8d4;
+	--badge-pink-glass-text: #9d174d;
+
+	--badge-teal-filled: #24d3ba;
+	--badge-teal-light-bg: #99f6e4;
+	--badge-teal-light-text: #0d9488;
+	--badge-teal-lighter-bg: #f0fdfa;
+	--badge-teal-lighter-text: #0f766e;
+	--badge-teal-stroke-text: #14b8a6;
+	--badge-teal-stroke-border: #5eead4;
+	--badge-teal-glass-bg: #ccfbf1;
+	--badge-teal-glass-border: #99f6e4;
+	--badge-teal-glass-text: #115e59;
+
+	--badge-brand-filled-text: var(--color-white);
+	--badge-brand-tint-bg: color-mix(in srgb, var(--color-accent-vivid) 15%, transparent);
+	--badge-brand-glass-bg: color-mix(in srgb, var(--color-accent-vivid) 12%, transparent);
+	--badge-brand-glass-border: color-mix(in srgb, var(--color-accent-vivid) 30%, transparent);
+	--badge-brand-glass-text: var(--color-accent-vivid);
+}
+
+/* ── Dark theme overrides ── */
+[data-theme='dark'] {
+	--color-bg: #0a0a0a;
+	--color-bg-alt: #111111;
+	--color-surface: #121212;
+	--color-surface-muted: #161616;
+	--color-border: rgba(255, 255, 255, 0.08);
+	--color-border-subtle: rgba(255, 255, 255, 0.06);
+
+	--color-text: #f2f2f2;
+	--color-text-muted: rgba(242, 242, 242, 0.6);
+	--color-text-subtle: rgba(242, 242, 242, 0.4);
+
+	--headline-color: #ffffff;
+
+	--color-accent: #00d4ae;
+	--color-accent-vivid: #00d4ae;
+	--color-accent-deep: #2dd4bf;
+
+	--shadow-card: 0px 1px 2px -1px rgba(0, 0, 0, 0.4), 0px 1px 3px rgba(0, 0, 0, 0.4);
+
+	/* ── Scrollbar (dark) ── */
+	--scrollbar-thumb: rgba(255, 255, 255, 0.18);
+	--scrollbar-thumb-hover: rgba(255, 255, 255, 0.32);
+
+	/* ── Glass cards (dark) ── */
+	--glass-card-bg: rgba(255, 255, 255, 0.04);
+	--glass-card-border: rgba(255, 255, 255, 0.1);
+	--glass-card-shadow: 0 1.5px 2px 0 rgba(255, 255, 255, 0.06) inset, 0 8px 28px rgba(0, 0, 0, 0.35);
+	--glass-card-blur: 14px;
+
+	/* ── BaseBadge palette (dark) — translucent washes + brightened text ── */
+	--badge-glass-shadow: 0 1.5px 2px 0 rgba(255, 255, 255, 0.08) inset;
+	--badge-glass-text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+
+	--badge-gray-light-bg: rgba(156, 163, 175, 0.18);
+	--badge-gray-light-text: #d1d5db;
+	--badge-gray-lighter-bg: rgba(156, 163, 175, 0.1);
+	--badge-gray-lighter-text: #9ca3af;
+	--badge-gray-stroke-text: #9ca3af;
+	--badge-gray-stroke-border: rgba(156, 163, 175, 0.45);
+	--badge-gray-glass-bg: rgba(156, 163, 175, 0.12);
+	--badge-gray-glass-border: rgba(156, 163, 175, 0.25);
+	--badge-gray-glass-text: #d1d5db;
+
+	--badge-blue-light-bg: rgba(59, 130, 246, 0.18);
+	--badge-blue-light-text: #93c5fd;
+	--badge-blue-lighter-bg: rgba(59, 130, 246, 0.1);
+	--badge-blue-lighter-text: #60a5fa;
+	--badge-blue-stroke-text: #60a5fa;
+	--badge-blue-stroke-border: rgba(59, 130, 246, 0.45);
+	--badge-blue-glass-bg: rgba(59, 130, 246, 0.15);
+	--badge-blue-glass-border: rgba(59, 130, 246, 0.3);
+	--badge-blue-glass-text: #93c5fd;
+
+	--badge-orange-light-bg: rgba(249, 115, 22, 0.18);
+	--badge-orange-light-text: #fdba74;
+	--badge-orange-lighter-bg: rgba(249, 115, 22, 0.1);
+	--badge-orange-lighter-text: #fb923c;
+	--badge-orange-stroke-text: #fb923c;
+	--badge-orange-stroke-border: rgba(249, 115, 22, 0.45);
+	--badge-orange-glass-bg: rgba(249, 115, 22, 0.15);
+	--badge-orange-glass-border: rgba(249, 115, 22, 0.3);
+	--badge-orange-glass-text: #fdba74;
+
+	--badge-red-light-bg: rgba(239, 68, 68, 0.18);
+	--badge-red-light-text: #fca5a5;
+	--badge-red-lighter-bg: rgba(239, 68, 68, 0.1);
+	--badge-red-lighter-text: #f87171;
+	--badge-red-stroke-text: #f87171;
+	--badge-red-stroke-border: rgba(239, 68, 68, 0.45);
+	--badge-red-glass-bg: rgba(239, 68, 68, 0.15);
+	--badge-red-glass-border: rgba(239, 68, 68, 0.3);
+	--badge-red-glass-text: #fca5a5;
+
+	--badge-green-light-bg: rgba(34, 197, 94, 0.18);
+	--badge-green-light-text: #86efac;
+	--badge-green-lighter-bg: rgba(34, 197, 94, 0.1);
+	--badge-green-lighter-text: #4ade80;
+	--badge-green-stroke-text: #4ade80;
+	--badge-green-stroke-border: rgba(34, 197, 94, 0.45);
+	--badge-green-glass-bg: rgba(34, 197, 94, 0.15);
+	--badge-green-glass-border: rgba(34, 197, 94, 0.3);
+	--badge-green-glass-text: #86efac;
+
+	--badge-yellow-light-bg: rgba(234, 179, 8, 0.18);
+	--badge-yellow-light-text: #fde047;
+	--badge-yellow-lighter-bg: rgba(234, 179, 8, 0.1);
+	--badge-yellow-lighter-text: #facc15;
+	--badge-yellow-stroke-text: #facc15;
+	--badge-yellow-stroke-border: rgba(234, 179, 8, 0.45);
+	--badge-yellow-glass-bg: rgba(234, 179, 8, 0.15);
+	--badge-yellow-glass-border: rgba(234, 179, 8, 0.3);
+	--badge-yellow-glass-text: #fde047;
+
+	--badge-purple-light-bg: rgba(168, 85, 247, 0.18);
+	--badge-purple-light-text: #d8b4fe;
+	--badge-purple-lighter-bg: rgba(168, 85, 247, 0.1);
+	--badge-purple-lighter-text: #c084fc;
+	--badge-purple-stroke-text: #c084fc;
+	--badge-purple-stroke-border: rgba(168, 85, 247, 0.45);
+	--badge-purple-glass-bg: rgba(168, 85, 247, 0.15);
+	--badge-purple-glass-border: rgba(168, 85, 247, 0.3);
+	--badge-purple-glass-text: #d8b4fe;
+
+	--badge-sky-light-bg: rgba(14, 165, 233, 0.18);
+	--badge-sky-light-text: #7dd3fc;
+	--badge-sky-lighter-bg: rgba(14, 165, 233, 0.1);
+	--badge-sky-lighter-text: #38bdf8;
+	--badge-sky-stroke-text: #38bdf8;
+	--badge-sky-stroke-border: rgba(14, 165, 233, 0.45);
+	--badge-sky-glass-bg: rgba(14, 165, 233, 0.15);
+	--badge-sky-glass-border: rgba(14, 165, 233, 0.3);
+	--badge-sky-glass-text: #7dd3fc;
+
+	--badge-pink-light-bg: rgba(236, 72, 153, 0.18);
+	--badge-pink-light-text: #f9a8d4;
+	--badge-pink-lighter-bg: rgba(236, 72, 153, 0.1);
+	--badge-pink-lighter-text: #f472b6;
+	--badge-pink-stroke-text: #f472b6;
+	--badge-pink-stroke-border: rgba(236, 72, 153, 0.45);
+	--badge-pink-glass-bg: rgba(236, 72, 153, 0.15);
+	--badge-pink-glass-border: rgba(236, 72, 153, 0.3);
+	--badge-pink-glass-text: #f9a8d4;
+
+	--badge-teal-light-bg: rgba(20, 184, 166, 0.18);
+	--badge-teal-light-text: #5eead4;
+	--badge-teal-lighter-bg: rgba(20, 184, 166, 0.1);
+	--badge-teal-lighter-text: #2dd4bf;
+	--badge-teal-stroke-text: #2dd4bf;
+	--badge-teal-stroke-border: rgba(20, 184, 166, 0.45);
+	--badge-teal-glass-bg: rgba(20, 184, 166, 0.15);
+	--badge-teal-glass-border: rgba(20, 184, 166, 0.3);
+	--badge-teal-glass-text: #5eead4;
+
+	--badge-brand-glass-bg: color-mix(in srgb, var(--color-accent-vivid) 16%, transparent);
+	--badge-brand-glass-border: color-mix(in srgb, var(--color-accent-vivid) 35%, transparent);
+	--badge-brand-glass-text: var(--color-accent-vivid);
+}
